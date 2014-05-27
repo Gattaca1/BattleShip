@@ -107,8 +107,10 @@ class player(object):
 				if target not in self.shot_Log and valid == (True) and target not in self.firing_Queue:
 					self.firing_Queue.append(target)
 			
-			
-class gameBoard(player):
+class playerComputer(player):
+	pass
+	
+class gameBoard(object):
 
 	def __init__(self):
 	
@@ -121,13 +123,6 @@ class gameBoard(player):
 		'carrier':5,
 		'tug':2
 		}
-		"""
-		'boatplug':1,
-		'cargo':4,
-		'supercarrier':6,
-		'motorboat':2
-		}
-		"""
 		
 		self.board = {}
 		self.create_Board()
@@ -332,6 +327,8 @@ def play_Game():
 	# If a human is playing, set as player 1 (index 0)
 	
 	players = [player_Human, player_Computer]
+	player1 = players[0]
+	player2 = players[1]
 	while game_Won == (False):
 	
 		turn = whose_Turn(players, turn_Count)
@@ -345,15 +342,6 @@ def play_Game():
 			game_Won = player_Computer.game_Status()
 			if game_Won == (True):
 				print "You win!"
-		
-		if turn == player_Computer1:
-						
-			destination = pick_Target_Computer(player1)
-			print "[Computer1]> %s" % (destination)
-			shoot(player1, player2, destination)
-			game_Won = player2.game_Status()
-			if game_Won == (True):
-				print "Computer1 wins!"
 				
 		if turn == player_Computer:
 						
