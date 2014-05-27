@@ -327,14 +327,14 @@ def play_Game():
 	player_Computer = player()
 	player_Human = player()
 	
-	player_Order = [player_Human, player_Computer]
+	players = [player_Human, player_Computer]
 	
 	game_Won = (False)
 	turn_Count = 0
 	
 	while game_Won == (False):
 	
-		turn = whose_Turn(player_Order, turn_Count)
+		turn = whose_Turn(players, turn_Count)
 		
 		if turn == player_Human:
 			"""Turn order: 1) display board, 2) pick target, 3) check target(maybe refire), 4)launch missle"""
