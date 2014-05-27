@@ -292,67 +292,82 @@ class gameBoard(object):
 			self.board[coordinate][0] = ('boat')
 			self.ships_Left.append(coordinate)
 												
-			
-def shoot(friendly, tango, destination):	
-	
-	#modify friendly firing board
-	#write shot to friendly firing log
-	friendly.shots_Fired(destination)
-	
-	#modify tango ship board
-	#if it hits a boat, remove it from tango boats left list
-	boat_Hit = tango.ship_Board.shot_Received(destination)
-	
-	if boat_Hit == (True):
-	
-		#if it hits a boat write to friendly boat hit log
-		friendly.hit_Boat(destination)
-		print "%s hit a boat!" % (destination)		
-			
-	
-def whose_Turn(player_List, turn_Count):
 
-	if turn_Count % 2 == 0:
-		return player_List[0]
-	return player_List[1]
-		
-		
-def play_Game():
+class gameEngine(object):
 
-	game_Won = (False)
-	turn_Count = 0
-	player_Computer = player()
-	player_Human = player()
-	
-	# If a human is playing, set as player 1 (index 0)
-	
-	players = [player_Human, player_Computer]
-	player1 = players[0]
-	player2 = players[1]
-	while game_Won == (False):
-	
-		turn = whose_Turn(players, turn_Count)
+	def __init__(self):
+		self.player_Computer = player()
+		self.player_Human = player()
 		
-		if turn == player_Human:
-			"""Turn order: 1) display board, 2) pick target, 3) check target(maybe refire), 4)launch missle"""
+	def shoot(friendly, tango, destination):	
+	
+		#modify friendly firing board
+		#write shot to friendly firing log
+		friendly.shots_Fired(destination)
+	
+		#modify tango ship board
+		#if it hits a boat, remove it from tango boats left list
+		boat_Hit = tango.ship_Board.shot_Received(destination)
+	
+		if boat_Hit == (True):
+	
+			#if it hits a boat write to friendly boat hit log
+			friendly.hit_Boat(destination)
+			print "%s hit a boat!" % (destination)		
 			
-			player1.display_Boards()
-			destination = pick_Target_Human(player1)
-			shoot(player1, player_Computer, destination)
-			game_Won = player_Computer.game_Status()
-			if game_Won == (True):
-				print "You win!"
+	
+	def whose_Turn(player_List, turn_Count):
+
+		if turn_Count % 2 == 0:
+			return player_List[0]
+		return player_List[1]
+	
+	def turn_Actions():
+		#pick target
+		#validate target
+		#call shoot
+		pass
+	
+	def game_Status():
+		pass
+	
+	def turn_Order():
+		pass
+		
+	def play_Game():
+
+		game_Won = (False)
+		turn_Count = 0
+		
+		players = [player_Human, player_Computer]
+		# If a human is playing, set as player 1 (index 0)
+	
+		player1 = players[0]
+		player2 = players[1]
+		while game_Won == (False):
+	
+			turn = whose_Turn(players, turn_Count)
+		
+			if turn == player_Human:
+				"""Turn order: 1) display board, 2) pick target, 3) check target(maybe refire), 4)launch missle"""
+			
+				player1.display_Boards()
+				destination = pick_Target_Human(player1)
+				shoot(player1, player_Computer, destination)
+				game_Won = player_Computer.game_Status()
+				if game_Won == (True):
+					print "You win!"
 				
-		if turn == player_Computer:
+			if turn == player_Computer:
 						
-			destination = pick_Target_Computer(player2)
-			print "[Computer]> %s" % (destination)
-			shoot(player2, player1, destination)
-			game_Won = player1.game_Status()
-			if game_Won == (True):
-				print "Computer wins!"
+				destination = pick_Target_Computer(player2)
+				print "[Computer]> %s" % (destination)
+				shoot(player2, player1, destination)
+				game_Won = player1.game_Status()
+				if game_Won == (True):
+					print "Computer wins!"
 							
-		turn_Count += 1	
+			turn_Count += 1	
 	
 	
 def pick_Target_Human(player):
@@ -385,16 +400,16 @@ def pick_Target_Computer(player):
 	
 def play_Again():
 	
-	new_Game = ''
-	while new_Game != 'y' and new_Game != 'n':
+	restart = ''
+	while restart != 'y' and restart != 'n':
 		print "Play again? answer with y or n"
-		new_Game = raw_input("> ")
+		restart = raw_input("> ")
 		
-	if new_Game == 'n':
-		exit()
+	if restart == 'y':
+		return (True)
 		
 	else:
-		return (True)
+		exit()
 		
 		
 def initiate_Game():

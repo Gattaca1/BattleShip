@@ -1,0 +1,72 @@
+class player
+	
+	pick_Target()
+
+	shots_Fired()
+
+	shots_Recieved()
+	
+	hit_Boat()
+
+	ships_Remaining()
+
+	display_Boards()
+
+
+class playerComputer
+
+	computer_Logic()
+
+	future_Targets()
+	
+	pick_Target()
+
+
+class gameboard
+
+	create_Board()
+
+	format_Board()
+
+	display_Board()
+
+	shot_Recieved()
+
+	valid_Target()
+
+	initialize_Ships()
+
+	assign_Ship_Coordinates()
+
+
+class ships
+
+	random_Coord()
+
+	potential_Vectors()
+
+	random_Vector()
+
+	generate_Ship_Coordinates()
+
+	validate_Ship_Coordinates()
+
+
+class game_Engine
+
+	shoot()
+
+	whose_Turn()
+
+	turn_Actions()
+
+	turn_Order()
+
+	game_Status()
+
+	play_Game()
+
+
+play_Again()
+
+initiage_Game()
