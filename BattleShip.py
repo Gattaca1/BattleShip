@@ -324,14 +324,14 @@ def whose_Turn(player_List, turn_Count):
 		
 def play_Game():
 
+	game_Won = (False)
+	turn_Count = 0
 	player_Computer = player()
 	player_Human = player()
 	
+	# If a human is playing, set as player 1 (index 0)
+	
 	players = [player_Human, player_Computer]
-	
-	game_Won = (False)
-	turn_Count = 0
-	
 	while game_Won == (False):
 	
 		turn = whose_Turn(players, turn_Count)
@@ -345,6 +345,15 @@ def play_Game():
 			game_Won = player_Computer.game_Status()
 			if game_Won == (True):
 				print "You win!"
+		
+		if turn == player_Computer1:
+						
+			destination = pick_Target_Computer(player1)
+			print "[Computer1]> %s" % (destination)
+			shoot(player1, player2, destination)
+			game_Won = player2.game_Status()
+			if game_Won == (True):
+				print "Computer1 wins!"
 				
 		if turn == player_Computer:
 						
