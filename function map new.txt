@@ -13,14 +13,14 @@ class player
 	confirm_Valid_Target()
 
 
-class playerHuman
+class playerHuman(player)
 
 	display_Boards()
 
 	pick_Target()
 
 
-class playerComputer
+class playerComputer(player)
 
 	init()
 
@@ -40,19 +40,16 @@ class gameboard
 	format_Board()
 
 	display_Board()
+	
 
-	shot_Recieved()
 
-	valid_Target()
+class shipBoard(gameboard)
+
+	init()
 
 	initialize_Ships()
 
-	assign_Ship_Coordinates()
-
-
-class ships
-
-	init()
+	shot_Recieved()
 
 	random_Coord()
 
@@ -63,6 +60,13 @@ class ships
 	generate_Ship_Coordinates()
 
 	validate_Ship_Coordinates()
+
+	assign_Ship_Coordinates()
+
+
+class firingBoard(gameboard)
+
+	valid_Target()
 
 
 class game_Engine

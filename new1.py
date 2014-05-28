@@ -34,6 +34,7 @@ ballsack.print_Vaseline_Slug() #lets slide around on the floor
 nutsack = myEggs()
 nutsack.shit_Stain() #open my eggs
 """
+"""
 column = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
 row = ['1','2','3','4','5','6','7','8','9','10']
 
@@ -48,7 +49,11 @@ for letter in column:
 		strToPrint = strToPrint + ('\t' + (letter + num))
 	print strToPrint
 	print ''
+"""
 
+ships_Left = ['B1', 'A3']
+
+print len(ships_Left)
 
 
 

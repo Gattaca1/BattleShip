@@ -4,45 +4,41 @@ from random import randint
 class player(object):
 
 	def __init__(self):
-	
-		self.ship_Board = gameBoard()
-		self.ship_Board.initialize_Ships()
-		self.firing_Board = gameBoard()
-		self.shot_Log = []
-		self.firing_Queue = []
-		self.boat_Hit_Log = []
-		self.rand_Queue = []
+		self.ship_Board = shipBoard()
+		self.firing_Board = firingBoard()
 		
-	def shots_Fired(self, shot):
-	
-		self.shot_Log.append(shot)
-		self.firing_Board.board[shot][1] = ('hit')
-		if shot in self.rand_Queue:
-			self.rand_Queue.remove(shot)
 		
-	def shot_Received(self):
-		pass
+	def shot_Fired(self, shot, boat):
+		self.firing_Board.shoot_Target(shot, boat)
 		
-	def hit_Boat(self, shot):
-	
-		self.boat_Hit_Log.append(shot)
-		self.firing_Board.board[shot][0] = ('boat')
+		
+	def shot_Received(self, shot):
+		#modify ship board
+		
+		return boat_Hit
+		
 		
 	def are_Ships_Remaining(self):
-		if len(self.ship_Board.ships_Left) != 0:
+		#return true if any ships are remaining
+		if self.ship_Board.ships_Remaining() != 0:
 			return (True)
-		if len(self.ship_Board.ships_Left) == 0:
+		if self.ship_Board.ships_Remaining() == 0:
 			return (False)
 		else:
 			print 'error in are_Ships_Remaining'
 		
-	def confirm_Valid_Target():
-		pass
+		
+	def confirm_Valid_Target(self, target):
+		#return true if valid
+		valid = self.firing_Board.valid_Target(target)
+		return valid
 
 	
 class playerHuman(player):
+
 	def __init__(self):
 		player.__init__(self)
+		
 		
 	def display_Boards(self):
 	
@@ -53,21 +49,19 @@ class playerHuman(player):
 		print ""
 		self.ship_Board.display_Board()
 			
+			
 	def pick_Target(self):
 		# returns the target in format 'A4'
-		"""
+		
 		target_Picked = (False)
 		while target_Picked == (False):
 	
 			print "Shoot with the format A4"
 			target = str(raw_input("[You]> "))
-			if target == ('exit'):
-				exit()
-			validity = player.firing_Board.valid_Target(target)
-			target_Picked = validity
+			valid = self.confirm_Valid_Target(target)
+			target_Picked = valid
 			
 		return target
-		"""
 		
 		
 class playerComputer(player):
@@ -167,13 +161,6 @@ class gameBoard(object):
 	
 		self.column = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
 		self.row = ['1','2','3','4','5','6','7','8','9','10']	
-		self.ships_Left = []
-		self.ships = {
-		'battleship':3,
-		'submarine':3,
-		'carrier':5,
-		'tug':2
-		}
 		
 		self.board = {}
 		self.create_Board()
@@ -185,7 +172,7 @@ class gameBoard(object):
 			for num in self.row:
 				self.board[letter + num] = ['noBoat', 'noHit']
 				
-	####################################################### BOARD DISPLAY ##########################################################################			
+	
 	def format_Board(self, key):
 	
 		if self.board[key][0] == 'noBoat' and self.board[key][1] == 'noHit':
@@ -213,34 +200,51 @@ class gameBoard(object):
 			print row_Body
 			print ""
 		
-	####################################################### BOARD SHOOTING ##########################################################################	
-	def shot_Received(self, coordinate):
+
+class shipBoard(gameBoard):
+
+	def __init__(self):
+		gameBoard.__init__(self)
+		self.ships_Left = []
+		self.ships = {
+		'battleship':3,
+		'submarine':3,
+		'carrier':5,
+		'tug':2
+		}
+		self.ship_Positions = {}
+		self.initialize_Ships()
+		
 	
+	def was_Boat_Hit(self, coordinate):
+		if coordinate in self.ships_Left:
+			return (True)
+		else:
+			return (False)
+		
+		
+	def shot_Received(self, coordinate):
+		#check if a boat was hit
+		#Announce what boat was hit
+		#remove coordinate from ships_Left
 		#modify the ship board
-		#remove from shipsLeft
 		self.board[coordinate][1] = ('hit')
 		if coordinate in self.ships_Left:
 			self.ships_Left.remove(coordinate)
 			return (True)
 		return (False)
 		
-	def valid_Target(self, target):
-		#Not valid if target does not exist or if target has already been hit
-		if target not in self.board:
-			return (False)
-		elif self.board[target][1] == 'hit':
-			return (False)
-		else:
-			return (True)
-			
-	####################################################### SHIPS ##################################################################################	
+		
+	def ships_Remaining(self):
+		return (len(self.ships_Left))
+		
+		
 	def initialize_Ships(self):
 	
 		for ship in self.ships:
 		
 			valid = (False)
-			while valid == (False):
-				
+			while valid == (False):				
 				length = self.ships[ship]
 				starting_Coord = self.random_Coord()				
 				vector_Options = self.potential_Vectors(starting_Coord, length)	
@@ -248,8 +252,8 @@ class gameBoard(object):
 				ship_Coordinates = self.generate_Ship_Coordinates(starting_Coord, length, vector)				
 				valid = self.validate_Ship_Coordinates(ship_Coordinates)
 				if valid == (True):
-					self.assign_Ship_Coordinates(ship_Coordinates)
-									
+					self.assign_Ship_Coordinates(ship_Coordinates, ship)
+
 					
 	def random_Coord(self):
 	
@@ -332,14 +336,36 @@ class gameBoard(object):
 		return (True)
 		
 		
-	def assign_Ship_Coordinates(self, set_Coordinates):
+	def assign_Ship_Coordinates(self, set_Coordinates, ship):
 	
 		#given a set of coordinates, set each coordinate to occupied by boat
+		self.ship_Positions[ship] = []
 		for coordinate in set_Coordinates:
 			self.board[coordinate][0] = ('boat')
 			self.ships_Left.append(coordinate)
-												
+			self.ship_Positions[ship].append(coordinate)
+			
+		
+class firingBoard(gameBoard):
 
+	def __init__(self):
+		gameBoard.__init__(self)
+		
+	def valid_Target(self, target):
+		#Not valid if target does not exist or if target has already been hit
+		if target not in self.board:
+			return (False)
+		elif self.board[target][1] == 'hit':
+			return (False)
+		else:
+			return (True)
+			
+	def shoot_Target(self, target, boat):
+		self.board[target][1] = 'hit'
+		if boat == (True):
+			self.board[target][0] = 'boat'
+		
+		
 class gameEngine(object):
 
 	def __init__(self):
@@ -348,12 +374,10 @@ class gameEngine(object):
 		self.player_Order = self.player_Turn_Order()
 		
 	def shoot(self, friendly, tango, destination):
-		#opponent annouce what was hit
-		boat = tango.shot_Received()
-		if boat != '':
-			pass
+		#was a boat hit?
+		boat = tango.shot_Received(destination)
 		#modify firing board
-		pass
+		friendly.shot_Fired(destination, boat)
 				
 	def whose_Turn(self, turn_Count):
 		if turn_Count % 2 == 0:
@@ -365,7 +389,6 @@ class gameEngine(object):
 		#pick target and confirm valid
 		destination = offense.pick_Target()
 		self.shoot(offense, defense, destination)
-		return destination
 		
 	def is_Game_Over(self, player):
 		if player.are_Ships_Remaining() == (True):
@@ -390,15 +413,15 @@ class gameEngine(object):
 			self.player_Human.display_Boards()
 			
 			if players_Turn == self.player_Human:
-				destination = self.turn_Actions(self.player_Human, self.player_Computer)
+				self.turn_Actions(self.player_Human, self.player_Computer)
 				game_Won = self.is_Game_Over(self.player_Computer)
 				if game_Won == (True):
 					print "You win!"
 				
 			if players_Turn == self.player_Computer:
-				destination = self.turn_Actions(self.player_Computer, self.player_Human)				
-				print "[Computer]> %s" % (destination)				
+				self.turn_Actions(self.player_Computer, self.player_Human)	
 				game_Won = self.is_Game_Over(self.player_Human)
+				game_Won = (True)
 				if game_Won == (True):
 					print "Computer wins!"
 							
