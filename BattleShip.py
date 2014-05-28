@@ -1,7 +1,6 @@
 from sys import exit
 from random import randint
 
-
 class player(object):
 
 	def __init__(self):
@@ -14,7 +13,6 @@ class player(object):
 		self.boat_Hit_Log = []
 		self.rand_Queue = []
 		
-		
 	def shots_Fired(self, shot):
 	
 		self.shot_Log.append(shot)
@@ -22,12 +20,29 @@ class player(object):
 		if shot in self.rand_Queue:
 			self.rand_Queue.remove(shot)
 		
+	def shot_Received(self):
+		pass
 		
 	def hit_Boat(self, shot):
 	
 		self.boat_Hit_Log.append(shot)
 		self.firing_Board.board[shot][0] = ('boat')
 		
+	def are_Ships_Remaining(self):
+		if len(self.ship_Board.ships_Left) != 0:
+			return (True)
+		if len(self.ship_Board.ships_Left) == 0:
+			return (False)
+		else:
+			print 'error in are_Ships_Remaining'
+		
+	def confirm_Valid_Target():
+		pass
+
+	
+class playerHuman(player):
+	def __init__(self):
+		player.__init__(self)
 		
 	def display_Boards(self):
 	
@@ -37,14 +52,52 @@ class player(object):
 		print "						Ship Board"
 		print ""
 		self.ship_Board.display_Board()
+			
+	def pick_Target(self):
+		# returns the target in format 'A4'
+		"""
+		target_Picked = (False)
+		while target_Picked == (False):
+	
+			print "Shoot with the format A4"
+			target = str(raw_input("[You]> "))
+			if target == ('exit'):
+				exit()
+			validity = player.firing_Board.valid_Target(target)
+			target_Picked = validity
+			
+		return target
+		"""
 		
 		
-	def game_Status(self):
+class playerComputer(player):
+	"""Computer has 2 AI targeting systems. The first is for when there is no hits have been made,
+		and the second is to sink a ship once one has been found. 
 		
-		if self.ship_Board.ships_Left == []:
-			return (True)
-		return (False)
+		The way the first targeting system works is by seeing every way each ship can be arranged on the board, 
+		and assigning the number of positions to each cell. The cell with the highest number of positions 
+		will be the most likely to contain a ship. This will also only fire on every second cell. 
 		
+		The way the second targeting system works is it takes an initial coordinate which is a confirmed 
+		hit. it then determines the 4 points surrounding the hit, and assigns them to be the next targets
+		to shoot at. when one of those 4 points also confirms a hit, and the hit is on the same ship as the
+		original, then the vector has been confirmed. once the vector is confirmed, it will drop the remaining
+		targets from the queue, and make 2 new target coordinates on either endpoint. 
+		"""
+	def __init__(self):
+		player.__init__(self)
+		
+	def pick_Target(self):
+		# returns the target in format 'A4'
+		"""
+		target_Picked = (False)
+		while target_Picked == (False):
+			target = player.computer_Logic()
+			validity = player.firing_Board.valid_Target(target)
+			target_Picked = validity
+			
+		return target
+		"""
 		
 	def computer_Logic(self):
 	
@@ -106,10 +159,8 @@ class player(object):
 				valid = self.firing_Board.valid_Target(target)
 				if target not in self.shot_Log and valid == (True) and target not in self.firing_Queue:
 					self.firing_Queue.append(target)
-			
-class playerComputer(player):
-	pass
-	
+					
+
 class gameBoard(object):
 
 	def __init__(self):
@@ -149,20 +200,17 @@ class gameBoard(object):
 		
 	def display_Board(self):
 		
-		print "		%s	%s	%s	%s	%s	%s	%s	%s	%s	%s" % (
-		self.row[0], self.row[1], self.row[2], self.row[3], self.row[4],
-		self.row[5], self.row[6], self.row[7], self.row[8], self.row[9],
-		)
+		row_Header = ''
+		for num in self.row:
+			row_Header = row_Header + ('\t' + (num))
+		print row_Header
 		print ""
 		
 		for letter in self.column:
-			print "	%s	%s	%s	%s	%s	%s	%s	%s	%s	%s	%s" % (letter,
-			self.format_Board(letter + self.row[0]), self.format_Board(letter + self.row[1]), 
-			self.format_Board(letter + self.row[2]), self.format_Board(letter + self.row[3]), 
-			self.format_Board(letter + self.row[4]), self.format_Board(letter + self.row[5]), 
-			self.format_Board(letter + self.row[6]), self.format_Board(letter + self.row[7]), 
-			self.format_Board(letter + self.row[8]), self.format_Board(letter + self.row[9])
-			)
+			row_Body = '' + letter
+			for num in self.row:
+				row_Body = row_Body + ('\t' + (self.format_Board(letter + num)))
+			print row_Body
 			print ""
 		
 	####################################################### BOARD SHOOTING ##########################################################################	
@@ -201,7 +249,6 @@ class gameBoard(object):
 				valid = self.validate_Ship_Coordinates(ship_Coordinates)
 				if valid == (True):
 					self.assign_Ship_Coordinates(ship_Coordinates)
-		#print "Ship list: %s" % (self.ships_Left)
 									
 					
 	def random_Coord(self):
@@ -296,106 +343,66 @@ class gameBoard(object):
 class gameEngine(object):
 
 	def __init__(self):
-		self.player_Computer = player()
-		self.player_Human = player()
+		self.player_Computer = playerComputer()
+		self.player_Human = playerHuman()
+		self.player_Order = self.player_Turn_Order()
 		
-	def shoot(friendly, tango, destination):	
-	
-		#modify friendly firing board
-		#write shot to friendly firing log
-		friendly.shots_Fired(destination)
-	
-		#modify tango ship board
-		#if it hits a boat, remove it from tango boats left list
-		boat_Hit = tango.ship_Board.shot_Received(destination)
-	
-		if boat_Hit == (True):
-	
-			#if it hits a boat write to friendly boat hit log
-			friendly.hit_Boat(destination)
-			print "%s hit a boat!" % (destination)		
-			
-	
-	def whose_Turn(player_List, turn_Count):
-
+	def shoot(self, friendly, tango, destination):
+		#opponent annouce what was hit
+		boat = tango.shot_Received()
+		if boat != '':
+			pass
+		#modify firing board
+		pass
+				
+	def whose_Turn(self, turn_Count):
 		if turn_Count % 2 == 0:
-			return player_List[0]
-		return player_List[1]
+			return self.player_Order[0]
+		return self.player_Order[1]
 	
-	def turn_Actions():
-		#pick target
-		#validate target
-		#call shoot
-		pass
-	
-	def game_Status():
-		pass
-	
-	def turn_Order():
-		pass
+	def turn_Actions(self, offense, defense):
+		"""return the destination"""
+		#pick target and confirm valid
+		destination = offense.pick_Target()
+		self.shoot(offense, defense, destination)
+		return destination
 		
-	def play_Game():
-
+	def is_Game_Over(self, player):
+		if player.are_Ships_Remaining() == (True):
+			return (False)
+		if player.are_Ships_Remaining() == (False):
+			return (True)
+		else:
+			print "ERROR in is_Game_Over"
+	
+	def player_Turn_Order(self):
+		#randomly assign the turn order (human or computer shoots first)
+		shoots_First = [self.player_Human]
+		shoots_First.insert((randint(0,1)), self.player_Computer)
+		return shoots_First
+		
+	def play_Game(self):
 		game_Won = (False)
-		turn_Count = 0
+		turn_Count = 0		
 		
-		players = [player_Human, player_Computer]
-		# If a human is playing, set as player 1 (index 0)
-	
-		player1 = players[0]
-		player2 = players[1]
 		while game_Won == (False):
-	
-			turn = whose_Turn(players, turn_Count)
-		
-			if turn == player_Human:
-				"""Turn order: 1) display board, 2) pick target, 3) check target(maybe refire), 4)launch missle"""
+			players_Turn = self.whose_Turn(turn_Count)
+			self.player_Human.display_Boards()
 			
-				player1.display_Boards()
-				destination = pick_Target_Human(player1)
-				shoot(player1, player_Computer, destination)
-				game_Won = player_Computer.game_Status()
+			if players_Turn == self.player_Human:
+				destination = self.turn_Actions(self.player_Human, self.player_Computer)
+				game_Won = self.is_Game_Over(self.player_Computer)
 				if game_Won == (True):
 					print "You win!"
 				
-			if turn == player_Computer:
-						
-				destination = pick_Target_Computer(player2)
-				print "[Computer]> %s" % (destination)
-				shoot(player2, player1, destination)
-				game_Won = player1.game_Status()
+			if players_Turn == self.player_Computer:
+				destination = self.turn_Actions(self.player_Computer, self.player_Human)				
+				print "[Computer]> %s" % (destination)				
+				game_Won = self.is_Game_Over(self.player_Human)
 				if game_Won == (True):
 					print "Computer wins!"
 							
 			turn_Count += 1	
-	
-	
-def pick_Target_Human(player):
-
-	# returns the target in format 'A4'
-	target_Picked = (False)
-	while target_Picked == (False):
-	
-		print "Shoot with the format A4"
-		target = str(raw_input("[You]> "))
-		if target == ('exit'):
-			exit()
-		validity = player.firing_Board.valid_Target(target)
-		target_Picked = validity
-			
-	return target	
-		
-		
-def pick_Target_Computer(player):
-
-	# returns the target in format 'A4'
-	target_Picked = (False)
-	while target_Picked == (False):
-		target = player.computer_Logic()
-		validity = player.firing_Board.valid_Target(target)
-		target_Picked = validity
-			
-	return target
 	
 	
 def play_Again():
@@ -409,15 +416,17 @@ def play_Again():
 		return (True)
 		
 	else:
-		exit()
+		return (False)
 		
 		
 def initiate_Game():
 
-	new_Game = (True)
-	while new_Game == (True):
-		play_Game()
-		new_Game = play_Again()
+	start_New_Game = (True)
+	while start_New_Game == (True):
+		game_Instance = gameEngine()
+		game_Instance.play_Game()
+		start_New_Game = play_Again()
+	exit()
 	
 	
 initiate_Game()

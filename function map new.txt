@@ -1,6 +1,6 @@
 class player
-	
-	pick_Target()
+
+	init()
 
 	shots_Fired()
 
@@ -8,12 +8,21 @@ class player
 	
 	hit_Boat()
 
-	ships_Remaining()
+	are_Ships_Remaining()
+	
+	confirm_Valid_Target()
+
+
+class playerHuman
 
 	display_Boards()
 
+	pick_Target()
+
 
 class playerComputer
+
+	init()
 
 	computer_Logic()
 
@@ -23,6 +32,8 @@ class playerComputer
 
 
 class gameboard
+
+	init()
 
 	create_Board()
 
@@ -41,6 +52,8 @@ class gameboard
 
 class ships
 
+	init()
+
 	random_Coord()
 
 	potential_Vectors()
@@ -54,15 +67,17 @@ class ships
 
 class game_Engine
 
+	init()
+
 	shoot()
 
 	whose_Turn()
 
 	turn_Actions()
 
-	turn_Order()
+	is_Game_Over()
 
-	game_Status()
+	player_Turn_Order()
 
 	play_Game()
 
