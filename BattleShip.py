@@ -15,8 +15,18 @@ class player(object):
 	def shot_Received(self, shot):
 		#modify ship board
 		boat_Hit = self.ship_Board.shot_incoming(shot)
+	
+	def is_Boat_Hit(self, coordinate):
+		boat_Hit = self.ship_Board.was_Boat_Hit(coordinate)
 		return boat_Hit
 		
+	def what_Boat_Hit(self, coordinate):
+		boat = self.ship_Board.ship_Hit(coordinate)
+		return boat
+		
+	def did_Shot_Sink_Boat(self, ship):
+		ship_Sunk = self.ship_Board.is_Ship_Sunk(ship)
+		return ship_Sunk
 		
 	def are_Ships_Remaining(self):
 		#return true if any ships are remaining
@@ -74,9 +84,6 @@ class playerComputer(player):
 		"""
 	def __init__(self):
 		player.__init__(self)
-		self.firing_Queue = []
-		self.rand_Queue = []
-		self.boat_Hit_Log = []
 		
 		
 	def pick_Target(self):
@@ -90,6 +97,26 @@ class playerComputer(player):
 		
 		print "[Computer]> " + target
 		return target
+		
+
+class playerComputerEasy(playerComputer):
+
+	def __init__(self):
+		playerComputer.__init__(self)
+		self.shot_Log = []
+		self.firing_Queue = []
+		self.rand_Queue = []
+		self.boat_Hit_Log = []
+		
+		
+	def shot_Fired(self, shot, boat):
+		self.firing_Board.shoot_Target(shot, boat)
+		self.shot_Log.append(shot)
+		if shot in self.rand_Queue:
+			self.rand_Queue.remove(shot)		
+		if boat == (True):
+			self.boat_Hit_Log.append(shot)
+	
 		
 	def computer_Logic(self):
 	
@@ -131,7 +158,7 @@ class playerComputer(player):
 			column_Letter = item[:1]
 			row_Number = item[1:]			
 			column_Pos = self.firing_Board.column.index(column_Letter)
-			row_Pos = self.firing_Board.row.index(row_Number)			
+			row_Pos = self.firing_Board.row.index(row_Number)
 			potential_Targets = []
 			
 			if column_Pos != (9):
@@ -151,14 +178,7 @@ class playerComputer(player):
 				valid = self.firing_Board.valid_Target(target)
 				if target not in self.shot_Log and valid == (True) and target not in self.firing_Queue:
 					self.firing_Queue.append(target)
-					
 """
-class playerComputerEasy(playerComputer):
-
-	def __init__(self):
-		playerComputer.__init__(self)
-		
-		
 class playerComputerMedium(playerComputer):
 
 	def __init__(self):
@@ -238,13 +258,8 @@ class shipBoard(gameBoard):
 		#remove coordinate from ships_Left
 		#modify the ship board
 		self.board[coordinate][1] = ('hit')
-		if coordinate in self.ships_Left:
-			self.announce_Ship_Hit(coordinate)
-			self.announce_Ship_Sunk(coordinate)
+		if self.was_Boat_Hit(coordinate) == (True):
 			self.ships_Left.remove(coordinate)
-			return (True)
-		else:
-			return (False)
 		
 	
 	def was_Boat_Hit(self, coordinate):
@@ -254,13 +269,22 @@ class shipBoard(gameBoard):
 			return (False)
 		
 		
-	def announce_Ship_Hit(self, coordinate):
+	def ship_Hit(self, coordinate):
 		for ship in self.ship_Positions:
 			if coordinate in self.ship_Positions[ship]:
-				print ship + " Hit"
+				return ship
 				
-	def announce_Ship_Sunk(self, coordinate):
-		pass
+				
+	def is_Ship_Sunk(self, ship):
+		coordinates_Left = []
+		for coordinate in self.ship_Positions[ship]:
+			if coordinate in self.ships_Left:
+				coordinates_Left.append(coordinate)
+		if coordinates_Left == []:
+			return (True)
+		else:
+			return (False)
+		
 		
 	def ships_Remaining(self):
 		return (len(self.ships_Left))
@@ -396,7 +420,7 @@ class firingBoard(gameBoard):
 class gameEngine(object):
 
 	def __init__(self):
-		self.player_Computer = playerComputer()
+		self.player_Computer = self.select_Difficulty()
 		self.player_Human = playerHuman()
 		self.player_Order = self.player_Turn_Order()
 		
@@ -409,23 +433,40 @@ class gameEngine(object):
 			difficulty = raw_input("> ")
 			
 			if difficulty == ('Easy'):
-				return playerComputer()
+				return playerComputerEasy()
 				difficulty_Set = (True)
 				
 			if difficulty == ('Medium'):
-				return playerComputer()
+				return playerComputerEasy()
 				difficulty_Set = (True)
 				
 			if difficulty == ('Hard'):
-				return playerComputer()
+				return playerComputerEasy()
 				difficulty_Set = (True)
 
 				
 	def shoot(self, friendly, tango, destination):
 		#was a boat hit?
-		boat = tango.shot_Received(destination)
+		is_Boat_Hit = tango.is_Boat_Hit(destination)
+		
+		#shoot
+		tango.shot_Received(destination)
+		
+		is_Ship_Sunk = (False)
+		#what boat was hit
+		if is_Boat_Hit == (True):
+			boat_Hit = tango.what_Boat_Hit(destination)
+			print boat_Hit + " Hit"
+			
+			#did the shot sink the ship
+			is_Ship_Sunk = tango.did_Shot_Sink_Boat(boat_Hit)
+			if is_Ship_Sunk == (True):
+				print boat_Hit + " Sunk"
+		
+		##need to somehow get all the ship coordinates from the sunk ship
+		
 		#modify firing board
-		friendly.shot_Fired(destination, boat)
+		friendly.shot_Fired(destination, is_Boat_Hit)
 				
 	def whose_Turn(self, turn_Count):
 		if turn_Count % 2 == 0:
