@@ -77,6 +77,8 @@ class playerComputer(player):
 		self.firing_Queue = []
 		self.rand_Queue = []
 		self.boat_Hit_Log = []
+		
+		
 	def pick_Target(self):
 		# returns the target in format 'A4'
 		
@@ -150,7 +152,25 @@ class playerComputer(player):
 				if target not in self.shot_Log and valid == (True) and target not in self.firing_Queue:
 					self.firing_Queue.append(target)
 					
+"""
+class playerComputerEasy(playerComputer):
 
+	def __init__(self):
+		playerComputer.__init__(self)
+		
+		
+class playerComputerMedium(playerComputer):
+
+	def __init__(self):
+		playerComputer.__init__(self)
+		
+		
+class playerComputerHard(playerComputer):
+
+	def __init__(self):
+		playerComputer.__init__(self)
+"""	
+	
 class gameBoard(object):
 
 	def __init__(self):
@@ -380,6 +400,27 @@ class gameEngine(object):
 		self.player_Human = playerHuman()
 		self.player_Order = self.player_Turn_Order()
 		
+	def select_Difficulty(self):
+	
+		difficulty_Set = (False)
+		
+		while difficulty_Set == (False):
+			print "Select difficulty: Easy, Medium, Hard"
+			difficulty = raw_input("> ")
+			
+			if difficulty == ('Easy'):
+				return playerComputer()
+				difficulty_Set = (True)
+				
+			if difficulty == ('Medium'):
+				return playerComputer()
+				difficulty_Set = (True)
+				
+			if difficulty == ('Hard'):
+				return playerComputer()
+				difficulty_Set = (True)
+
+				
 	def shoot(self, friendly, tango, destination):
 		#was a boat hit?
 		boat = tango.shot_Received(destination)
