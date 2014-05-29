@@ -14,7 +14,7 @@ class player(object):
 		
 	def shot_Received(self, shot):
 		#modify ship board
-		
+		boat_Hit = self.ship_Board.shot_incoming(shot)
 		return boat_Hit
 		
 		
@@ -26,13 +26,7 @@ class player(object):
 			return (False)
 		else:
 			print 'error in are_Ships_Remaining'
-		
-		
-	def confirm_Valid_Target(self, target):
-		#return true if valid
-		valid = self.firing_Board.valid_Target(target)
-		return valid
-
+	
 	
 class playerHuman(player):
 
@@ -58,7 +52,7 @@ class playerHuman(player):
 	
 			print "Shoot with the format A4"
 			target = str(raw_input("[You]> "))
-			valid = self.confirm_Valid_Target(target)
+			valid = self.firing_Board.valid_Target(target)
 			target_Picked = valid
 			
 		return target
@@ -80,18 +74,20 @@ class playerComputer(player):
 		"""
 	def __init__(self):
 		player.__init__(self)
-		
+		self.firing_Queue = []
+		self.rand_Queue = []
+		self.boat_Hit_Log = []
 	def pick_Target(self):
 		# returns the target in format 'A4'
-		"""
+		
 		target_Picked = (False)
 		while target_Picked == (False):
-			target = player.computer_Logic()
-			validity = player.firing_Board.valid_Target(target)
-			target_Picked = validity
-			
+			target = self.computer_Logic()
+			valid = self.firing_Board.valid_Target(target)
+			target_Picked = valid
+		
+		print "[Computer]> " + target
 		return target
-		"""
 		
 	def computer_Logic(self):
 	
@@ -207,13 +203,28 @@ class shipBoard(gameBoard):
 		gameBoard.__init__(self)
 		self.ships_Left = []
 		self.ships = {
-		'battleship':3,
-		'submarine':3,
-		'carrier':5,
-		'tug':2
+		'Battleship':3,
+		'Submarine':3,
+		'Carrier':5,
+		'Tug':2
 		}
 		self.ship_Positions = {}
 		self.initialize_Ships()
+		
+		
+	def shot_incoming(self, coordinate):
+		#check if a boat was hit
+		#Announce what boat was hit
+		#remove coordinate from ships_Left
+		#modify the ship board
+		self.board[coordinate][1] = ('hit')
+		if coordinate in self.ships_Left:
+			self.announce_Ship_Hit(coordinate)
+			self.announce_Ship_Sunk(coordinate)
+			self.ships_Left.remove(coordinate)
+			return (True)
+		else:
+			return (False)
 		
 	
 	def was_Boat_Hit(self, coordinate):
@@ -223,17 +234,13 @@ class shipBoard(gameBoard):
 			return (False)
 		
 		
-	def shot_Received(self, coordinate):
-		#check if a boat was hit
-		#Announce what boat was hit
-		#remove coordinate from ships_Left
-		#modify the ship board
-		self.board[coordinate][1] = ('hit')
-		if coordinate in self.ships_Left:
-			self.ships_Left.remove(coordinate)
-			return (True)
-		return (False)
-		
+	def announce_Ship_Hit(self, coordinate):
+		for ship in self.ship_Positions:
+			if coordinate in self.ship_Positions[ship]:
+				print ship + " Hit"
+				
+	def announce_Ship_Sunk(self, coordinate):
+		pass
 		
 	def ships_Remaining(self):
 		return (len(self.ships_Left))
@@ -410,9 +417,9 @@ class gameEngine(object):
 		
 		while game_Won == (False):
 			players_Turn = self.whose_Turn(turn_Count)
-			self.player_Human.display_Boards()
 			
 			if players_Turn == self.player_Human:
+				self.player_Human.display_Boards()
 				self.turn_Actions(self.player_Human, self.player_Computer)
 				game_Won = self.is_Game_Over(self.player_Computer)
 				if game_Won == (True):
@@ -421,7 +428,6 @@ class gameEngine(object):
 			if players_Turn == self.player_Computer:
 				self.turn_Actions(self.player_Computer, self.player_Human)	
 				game_Won = self.is_Game_Over(self.player_Human)
-				game_Won = (True)
 				if game_Won == (True):
 					print "Computer wins!"
 							
