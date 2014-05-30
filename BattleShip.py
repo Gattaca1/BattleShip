@@ -69,6 +69,19 @@ class playerHuman(player):
 		
 		
 class playerComputer(player):
+	"""
+	Difficulty Easy:
+		Shoots every other square until a Target is hit. Fires around the entirety of the target.
+		
+	Difficulty Medium:
+		Shoots every other square until a target is hit. Determines the ships vector and discontinues
+		shooting when the ship has sunk.
+		
+	Difficulty Hard:
+		Determines the probability of ship positions, and shoots at the most likely. When a target is 
+		found, a vector will be determined and shooting will cease once the target is sunk.
+		
+	"""
 	"""Computer has 2 AI targeting systems. The first is for when there is no hits have been made,
 		and the second is to sink a ship once one has been found. 
 		
