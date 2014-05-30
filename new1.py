@@ -52,6 +52,12 @@ for letter in column:
 """
 """
 enemy_Ships_And_Their_coordinates = {}
+ship_Lengths = {
+		'Battleship':3,
+		'Submarine':3,
+		'Carrier':5,
+		'Tug':2
+		}
 
 def enemy_Ship_Coordinate(coordinate, ship):
 		if ship not in enemy_Ships_And_Their_coordinates:
@@ -63,8 +69,19 @@ enemy_Ship_Coordinate('A2', 'Tug')
 enemy_Ship_Coordinate('A3', 'Battleship')
 enemy_Ship_Coordinate('B3', 'Battleship')
 enemy_Ship_Coordinate('C3', 'Battleship')
-
 print enemy_Ships_And_Their_coordinates
+
+for ship in enemy_Ships_And_Their_coordinates:
+	if len(enemy_Ships_And_Their_coordinates[ship]) == ship_Lengths[ship]:
+		print ship + " Sunk"
+		break
+	print "cheese"
 """
-for i in range(10):
-	print i % 2
+valid = (True)
+
+if valid == (True):
+	print "Butter"
+elif valid != (False):
+	print "Milk"
+else:
+	print "Bread"
