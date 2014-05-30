@@ -50,7 +50,8 @@ for letter in column:
 	print strToPrint
 	print ''
 """
-"""
+
+
 enemy_Ships_And_Their_coordinates = {}
 ship_Lengths = {
 		'Battleship':3,
@@ -71,17 +72,4 @@ enemy_Ship_Coordinate('B3', 'Battleship')
 enemy_Ship_Coordinate('C3', 'Battleship')
 print enemy_Ships_And_Their_coordinates
 
-for ship in enemy_Ships_And_Their_coordinates:
-	if len(enemy_Ships_And_Their_coordinates[ship]) == ship_Lengths[ship]:
-		print ship + " Sunk"
-		break
-	print "cheese"
-"""
-valid = (True)
-
-if valid == (True):
-	print "Butter"
-elif valid != (False):
-	print "Milk"
-else:
-	print "Bread"
+print len(enemy_Ships_And_Their_coordinates)

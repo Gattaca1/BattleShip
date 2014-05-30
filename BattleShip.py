@@ -218,9 +218,10 @@ class playerComputerMedium(playerComputer):
 
 	def computer_Logic(self):
 		self.add_Potential_Target_To_Firing_Queue()
-
-		if self.firing_Queue != []:
-			return (self.firing_Queue.pop((len(self.firing_Queue) - 1)))
+		if len(self.firing_Queue) >= 1:
+			target = (self.firing_Queue.pop((len(self.firing_Queue) - 1)))
+			print target
+			return target
 		else:
 			target = self.rand_Queue[(randint(0, (len(self.rand_Queue) - 1)))]
 			return target
@@ -228,7 +229,8 @@ class playerComputerMedium(playerComputer):
 	def add_Potential_Target_To_Firing_Queue(self):
 		#have any ships been hit that are not yet sunk? better try and sink that ship
 		#are two coordinates known, or just one?
-		if self.enemy_Ships_And_Their_coordinates != {}:
+		if (len(self.enemy_Ships_And_Their_coordinates)) >= 1:
+			print self.enemy_Ships_And_Their_coordinates
 			for ship in self.enemy_Ships_And_Their_coordinates:
 
 				num_Of_Coordinates_Hit_On_Ship = len(self.enemy_Ships_And_Their_coordinates[ship])
@@ -237,17 +239,20 @@ class playerComputerMedium(playerComputer):
 				if num_Of_Coordinates_Hit_On_Ship == 1:
 					target = self.rand_Coord_Adjacent_To_Confirmed_Hit(ship)
 					self.firing_Queue.append(target)
-
+					break
 				elif num_Of_Coordinates_Hit_On_Ship >= 2 and num_Of_Coordinates_Hit_On_Ship < ship_Length:
 					target = self.rand_Coord_Along_Vector_Of_Confirmed_Hit(ship)
 					self.firing_Queue.append(target)
+					break
+				else:
+					break
 
 	def rand_Coord_Adjacent_To_Confirmed_Hit(self, ship):
 		confirmed_Hit = self.enemy_Ships_And_Their_coordinates[ship][0]
 
 		column = self.column
 		row = self.row
-		
+
 		column_Letter = confirmed_Hit[:1]
 		row_Number = confirmed_Hit[1:]			
 		column_Pos = column.index(column_Letter)
@@ -271,10 +276,13 @@ class playerComputerMedium(playerComputer):
 			valid = self.firing_Board.valid_Target(target)
 			if valid == (False):
 				potential_Targets.remove(target)
-		random_Target = randint(0, (len(potential_Targets) - 1))
+		random_Target = potential_Targets[randint(0, (len(potential_Targets) - 1))]
 		return random_Target
 		
 	def rand_Coord_Along_Vector_Of_Confirmed_Hit(self, ship):
+		#compare 2 confirmed ship coordinates and see if they are in the same column or row
+		#determine the endpoints, and fire at one beyond that.
+		#check to see if the coordinate beyond that is valid (eg, hasn't been shot at yet)
 		pass
 
 
