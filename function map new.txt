@@ -2,34 +2,46 @@ class player
 
 	init()
 
-	shots_Fired()
+	shot_Fired()
 
-	shots_Recieved()
-	
-	hit_Boat()
+	shot_Recieved()
+
+	is_Boat_Hit()
+
+	what_Boat_Hit()
+
+	did_Shot_Sink_Boat()
 
 	are_Ships_Remaining()
-	
-	confirm_Valid_Target()
-
 
 class playerHuman(player)
+	
+	__init__()
 
 	display_Boards()
 
 	pick_Target()
 
-
 class playerComputer(player)
 
 	init()
+	
+	pick_Target()
+
+class playerComputerEasy(playerComputer)
+
+	__init__()
+
+	shot_Fired()
 
 	computer_Logic()
 
 	future_Targets()
-	
-	pick_Target()
 
+class playerComputerMedium(playerComputer)
+	pass
+class playerComputerHard(playerComputer)
+	pass
 
 class gameboard
 
@@ -41,15 +53,21 @@ class gameboard
 
 	display_Board()
 	
-
-
 class shipBoard(gameboard)
 
 	init()
 
-	initialize_Ships()
+	shot_Incoming()
 
-	shot_Recieved()
+	was_Boat_Hit()
+
+	ship_Hit()
+
+	is_Ship_Sunk()
+
+	ships_Remaining()
+
+	initialize_Ships()
 
 	random_Coord()
 
@@ -63,15 +81,19 @@ class shipBoard(gameboard)
 
 	assign_Ship_Coordinates()
 
-
 class firingBoard(gameboard)
+
+	__init__()
 
 	valid_Target()
 
+	shoot_Target()
 
 class game_Engine
 
 	init()
+
+	select_Difficulty()
 
 	shoot()
 
@@ -84,7 +106,6 @@ class game_Engine
 	player_Turn_Order()
 
 	play_Game()
-
 
 play_Again()
 

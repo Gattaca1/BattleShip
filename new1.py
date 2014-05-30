@@ -51,10 +51,18 @@ for letter in column:
 	print ''
 """
 
-ships_Left = ['B1', 'A3']
+enemy_Ships_And_Their_coordinates = {}
 
-print len(ships_Left)
+def enemy_Ship_Coordinate(coordinate, ship):
+		if ship not in enemy_Ships_And_Their_coordinates:
+			enemy_Ships_And_Their_coordinates[ship] = []
+		enemy_Ships_And_Their_coordinates[ship].append(coordinate)
 
+enemy_Ship_Coordinate('A1', 'Tug')
+enemy_Ship_Coordinate('A2', 'Tug')
+enemy_Ship_Coordinate('A3', 'Battleship')
+enemy_Ship_Coordinate('B3', 'Battleship')
+enemy_Ship_Coordinate('C3', 'Battleship')
 
-
+print enemy_Ships_And_Their_coordinates
 

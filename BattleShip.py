@@ -6,22 +6,20 @@ class player(object):
 	def __init__(self):
 		self.ship_Board = shipBoard()
 		self.firing_Board = firingBoard()
-		
-		
+				
 	def shot_Fired(self, shot, boat):
-		self.firing_Board.shoot_Target(shot, boat)
+		self.firing_Board.shoot_Target(shot, boat)		
 		
-		
-	def shot_Received(self, shot):
+	def shot_Received(self, coordinates):
 		#modify ship board
-		boat_Hit = self.ship_Board.shot_incoming(shot)
+		boat_Hit = self.ship_Board.shot_incoming(coordinates)
 	
 	def is_Boat_Hit(self, coordinate):
-		boat_Hit = self.ship_Board.was_Boat_Hit(coordinate)
+		boat_Hit = self.ship_Board.is_A_Boat_At_Coordinates(coordinate)
 		return boat_Hit
 		
 	def what_Boat_Hit(self, coordinate):
-		boat = self.ship_Board.ship_Hit(coordinate)
+		boat = self.ship_Board.ship_At_Coordinates(coordinate)
 		return boat
 		
 	def did_Shot_Sink_Boat(self, ship):
@@ -30,13 +28,15 @@ class player(object):
 		
 	def are_Ships_Remaining(self):
 		#return true if any ships are remaining
-		if self.ship_Board.ships_Remaining() != 0:
+		if self.ship_Board.ship_Positions_Remaining() != 0:
 			return (True)
-		if self.ship_Board.ships_Remaining() == 0:
+		elif self.ship_Board.ship_Positions_Remaining() == 0:
 			return (False)
 		else:
 			print 'error in are_Ships_Remaining'
-	
+			
+	def enemy_Ship_Coordinate(self, coordinate, ship):
+		pass
 	
 class playerHuman(player):
 
@@ -84,7 +84,7 @@ class playerComputer(player):
 		"""
 	def __init__(self):
 		player.__init__(self)
-		
+		self.enemy_Ships_And_Their_coordinates = {}
 		
 	def pick_Target(self):
 		# returns the target in format 'A4'
@@ -98,7 +98,11 @@ class playerComputer(player):
 		print "[Computer]> " + target
 		return target
 		
-
+	def enemy_Ship_Coordinate(self, coordinate, ship):
+		if ship not in self.enemy_Ships_And_Their_coordinates:
+			self.enemy_Ships_And_Their_coordinates[ship] = []
+		self.enemy_Ships_And_Their_coordinates[ship].append(coordinate)
+		
 class playerComputerEasy(playerComputer):
 
 	def __init__(self):
@@ -196,7 +200,13 @@ class gameBoard(object):
 	def __init__(self):
 	
 		self.column = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
-		self.row = ['1','2','3','4','5','6','7','8','9','10']	
+		self.row = ['1','2','3','4','5','6','7','8','9','10']
+		self.ships = {
+		'Battleship':3,
+		'Submarine':3,
+		'Carrier':5,
+		'Tug':2
+		}
 		
 		self.board = {}
 		self.create_Board()
@@ -241,35 +251,30 @@ class shipBoard(gameBoard):
 
 	def __init__(self):
 		gameBoard.__init__(self)
-		self.ships_Left = []
-		self.ships = {
-		'Battleship':3,
-		'Submarine':3,
-		'Carrier':5,
-		'Tug':2
-		}
+		self.not_Hit_Boat_Occupied_Coordinates = []
+			#old name = self.ships_Left
 		self.ship_Positions = {}
 		self.initialize_Ships()
 		
 		
 	def shot_incoming(self, coordinate):
-		#check if a boat was hit
-		#Announce what boat was hit
-		#remove coordinate from ships_Left
 		#modify the ship board
+		#remove coordinate from ships_Left
 		self.board[coordinate][1] = ('hit')
-		if self.was_Boat_Hit(coordinate) == (True):
-			self.ships_Left.remove(coordinate)
+		if self.is_A_Boat_At_Coordinates(coordinate) == (True):
+			self.not_Hit_Boat_Occupied_Coordinates.remove(coordinate)
 		
 	
-	def was_Boat_Hit(self, coordinate):
-		if coordinate in self.ships_Left:
+	def is_A_Boat_At_Coordinates(self, coordinate):
+		#old name = was_Boat_Hit
+		if coordinate in self.not_Hit_Boat_Occupied_Coordinates:
 			return (True)
 		else:
 			return (False)
 		
 		
-	def ship_Hit(self, coordinate):
+	def ship_At_Coordinates(self, coordinate):
+		#old name = ship_Hit
 		for ship in self.ship_Positions:
 			if coordinate in self.ship_Positions[ship]:
 				return ship
@@ -278,7 +283,7 @@ class shipBoard(gameBoard):
 	def is_Ship_Sunk(self, ship):
 		coordinates_Left = []
 		for coordinate in self.ship_Positions[ship]:
-			if coordinate in self.ships_Left:
+			if coordinate in self.not_Hit_Boat_Occupied_Coordinates:
 				coordinates_Left.append(coordinate)
 		if coordinates_Left == []:
 			return (True)
@@ -286,8 +291,9 @@ class shipBoard(gameBoard):
 			return (False)
 		
 		
-	def ships_Remaining(self):
-		return (len(self.ships_Left))
+	def ship_Positions_Remaining(self):
+		#old name = ships_Remaining
+		return (len(self.not_Hit_Boat_Occupied_Coordinates))
 		
 		
 	def initialize_Ships(self):
@@ -393,7 +399,7 @@ class shipBoard(gameBoard):
 		self.ship_Positions[ship] = []
 		for coordinate in set_Coordinates:
 			self.board[coordinate][0] = ('boat')
-			self.ships_Left.append(coordinate)
+			self.not_Hit_Boat_Occupied_Coordinates.append(coordinate)
 			self.ship_Positions[ship].append(coordinate)
 			
 		
@@ -457,6 +463,9 @@ class gameEngine(object):
 		if is_Boat_Hit == (True):
 			boat_Hit = tango.what_Boat_Hit(destination)
 			print boat_Hit + " Hit"
+			
+			#pass the boat name to the friendly player to keep track of boats they've hit
+			friendly.enemy_Ship_Coordinate(destination, boat_Hit)
 			
 			#did the shot sink the ship
 			is_Ship_Sunk = tango.did_Shot_Sink_Boat(boat_Hit)
