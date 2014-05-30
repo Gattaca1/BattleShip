@@ -98,6 +98,7 @@ class playerComputer(player):
 	def __init__(self):
 		player.__init__(self)
 		self.enemy_Ships_And_Their_coordinates = {}
+		self.rand_Queue = []
 		
 	def pick_Target(self):
 		# returns the target in format 'A4'
@@ -115,15 +116,33 @@ class playerComputer(player):
 		if ship not in self.enemy_Ships_And_Their_coordinates:
 			self.enemy_Ships_And_Their_coordinates[ship] = []
 		self.enemy_Ships_And_Their_coordinates[ship].append(coordinate)
+
+	def generate_Random_Queue_Targets(self):
+		column = self.firing_Board.column
+		row = self.firing_Board.row
 		
+		#fire only on every other square
+		if self.rand_Queue == []:
+			for i in column:
+				if column.index(i) % 2 == 0:
+					# If column is even, fire on odd row
+					for n in row:
+						if row.index(n) % 2 == 1:
+							self.rand_Queue.append((i + n))
+				if column.index(i) % 2 == 1:
+					for n in row:
+						if row.index(n) % 2 == 0:
+							self.rand_Queue.append((i + n))
+		
+
 class playerComputerEasy(playerComputer):
 
 	def __init__(self):
 		playerComputer.__init__(self)
 		self.shot_Log = []
 		self.firing_Queue = []
-		self.rand_Queue = []
 		self.boat_Hit_Log = []
+		self.generate_Random_Queue_Targets()
 		
 		
 	def shot_Fired(self, shot, boat):
@@ -134,37 +153,23 @@ class playerComputerEasy(playerComputer):
 		if boat == (True):
 			self.boat_Hit_Log.append(shot)
 	
-		
-	def computer_Logic(self):
-	
+
+	def computer_Logic(self):	
 		#Add items to the firing queue
 		self.future_Targets()
 		
-		if self.firing_Queue != []:
-		
+		if self.firing_Queue != []:		
 			target = randint(0, (len(self.firing_Queue) - 1))
 			return (self.firing_Queue.pop(target))
 			
 		else:
-			column = self.firing_Board.column
-			row = self.firing_Board.row
-			
-			#fire only on every other square
-			if self.rand_Queue == []:
-				for i in column:
-					if column.index(i) % 2 == 0:
-						for n in row:
-							if row.index(n) % 2 == 0:
-								self.rand_Queue.append((i + n))
-					elif column.index(i) % 2 != 0:
-						for n in row:
-							if row.index(n) % 2 != 0:
-								self.rand_Queue.append((i + n))
-			
 			target = self.rand_Queue[(randint(0, (len(self.rand_Queue) - 1)))]
 			return target
 		
-		
+
+	
+
+
 	def future_Targets(self):
 		
 		#Add area around confirmed hits to a firing queue

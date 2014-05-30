@@ -50,7 +50,7 @@ for letter in column:
 	print strToPrint
 	print ''
 """
-
+"""
 enemy_Ships_And_Their_coordinates = {}
 
 def enemy_Ship_Coordinate(coordinate, ship):
@@ -65,4 +65,6 @@ enemy_Ship_Coordinate('B3', 'Battleship')
 enemy_Ship_Coordinate('C3', 'Battleship')
 
 print enemy_Ships_And_Their_coordinates
-
+"""
+for i in range(10):
+	print i % 2
