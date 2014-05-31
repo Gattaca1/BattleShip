@@ -65,7 +65,7 @@ class playerHuman(player):
 		while target_Picked == (False):
 	
 			print "Shoot with the format A4"
-			target = str(raw_input("[You]> "))
+			target = str(raw_input("[You]> ")).upper()
 			valid = self.firing_Board.valid_Target(target)
 			target_Picked = valid
 			
@@ -591,17 +591,17 @@ class gameEngine(object):
 		
 		while difficulty_Set == (False):
 			print "Select difficulty: Easy, Medium, Hard"
-			difficulty = raw_input("> ")
+			difficulty = raw_input("> ").upper()
 			
-			if difficulty == ('Easy'):
+			if difficulty == ('EASY'):
 				return playerComputerEasy()
 				difficulty_Set = (True)
 				
-			if difficulty == ('Medium'):
+			if difficulty == ('MEDIUM'):
 				return playerComputerMedium()
 				difficulty_Set = (True)
 				
-			if difficulty == ('Hard'):
+			if difficulty == ('HARD'):
 				return playerComputerEasy()
 				difficulty_Set = (True)
 
