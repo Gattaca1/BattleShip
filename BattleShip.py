@@ -335,18 +335,18 @@ class playerComputerMedium(playerComputer):
 		while target_Added == (False):
 			previous_Increment = (increment - 1)
 
-			if matching_Vector = 'horizontal':
+			if matching_Vector == 'horizontal':
 				#try increase vector
 				previous_Increased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index + previous_Increment)])
-				if previous_Increased_Vector
-				increased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index + increment)])
-				potential_Targets.append(increased_Vector)
+				if previous_Increased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
+					increased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index + increment)])
+					potential_Targets.append(increased_Vector)
 
 				#try decrease vector
 				decreased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index - increment)])
 				potential_Targets.append(decreased_Vector)
 
-			elif matching_Vector = 'vertical':
+			elif matching_Vector == 'vertical':
 				#try increase vector
 				increased_Vector = (column[(first_Coordinate_Column_Index + increment)] + first_Coordinate_Row_Number)
 				potential_Targets.append(increased_Vector)
@@ -358,7 +358,8 @@ class playerComputerMedium(playerComputer):
 			for target in potential_Targets:
 				if target in self.enemy_Ships_And_Their_coordinates[ship]:
 					potential_Targets.remove(target)
-				if target in self.shot_Log
+				if target in self.shot_Log:
+					pass
 			"""
 			Gotta stop it from doing this:
 			turn1) _ _ [#] (X) (X) _ _ 
