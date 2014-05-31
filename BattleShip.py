@@ -332,34 +332,59 @@ class playerComputerMedium(playerComputer):
 		potential_Targets = []
 		target_Added = (False)
 		increment = 1
+		#this loop will keep incrimenting until it hits a unhit vector. this loop also shouldn't run if 
+		#the ship is sunk. part of the initial contract. so by checking if increment -1 is in the 
+		#list of confirmed ship hits, than you can fire at increment +1. however, if increment -1
+		#is in the shots fired log, but not in the confirmed ship its, then don't shoot at increment +1
+
+		#should increment -1 always be in the confirmed hit log?
+		#what if increment -1 is in confirmed hit log, but increment +1 is already shot at - either randomly
+		#or from another ship being nearby.
 		while target_Added == (False):
 			previous_Increment = (increment - 1)
 
 			if matching_Vector == 'horizontal':
 				#try increase vector
 				previous_Increased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index + previous_Increment)])
-				if previous_Increased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
+				if previous_Increased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:					
 					increased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index + increment)])
-					potential_Targets.append(increased_Vector)
+					if increased_Vector not in self.shot_Log:
+						valid = self.is_Target_Valid(increased_Vector)
+						if valid == (True):
+							target = increased_Vector
+							target_Added = (True)
 
 				#try decrease vector
-				decreased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index - increment)])
-				potential_Targets.append(decreased_Vector)
+				previous_Decreased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index - previous_Increment)])
+				if previous_Decreased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
+					decreased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index - increment)])
+					if decreased_Vector not in self.shot_Log:
+						valid = self.is_Target_Valid(decreased_Vector)
+						if valid == (True):
+							target = increased_Vector
+							target_Added = (True)
 
 			elif matching_Vector == 'vertical':
 				#try increase vector
-				increased_Vector = (column[(first_Coordinate_Column_Index + increment)] + first_Coordinate_Row_Number)
-				potential_Targets.append(increased_Vector)
+				previous_Increased_Vector = (column[(first_Coordinate_Column_Index + previous_Increment)] + first_Coordinate_Row_Number)
+				if previous_Increased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
+					increased_Vector = (column[(first_Coordinate_Column_Index + increment)] + first_Coordinate_Row_Number)
+					if increased_Vector not in self.shot_Log:
+						valid = self.is_Target_Valid(increased_Vector)
+						if valid == (True):
+							target = increased_Vector
+							target_Added = (True)
 
 				#try decrease vector
-				decreased_Vector = (column[(first_Coordinate_Column_Index - increment)] + first_Coordinate_Row_Number)
-				potential_Targets.append(decreased_Vector)
-
-			for target in potential_Targets:
-				if target in self.enemy_Ships_And_Their_coordinates[ship]:
-					potential_Targets.remove(target)
-				if target in self.shot_Log:
-					pass
+				previous_Decreased_Vector = (column[(first_Coordinate_Column_Index - previous_Increment)] + first_Coordinate_Row_Number)
+				if previous_Decreased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
+					decreased_Vector = (column[(first_Coordinate_Column_Index - increment)] + first_Coordinate_Row_Number)
+					if decreased_Vector not in self.shot_Log:
+						valid = self.is_Target_Valid(decreased_Vector)
+						if valid == (True):
+							target = decreased_Vector
+							target_Added = (True)
+			
 			"""
 			Gotta stop it from doing this:
 			turn1) _ _ [#] (X) (X) _ _ 
@@ -367,7 +392,8 @@ class playerComputerMedium(playerComputer):
 			turn3) _ _ [#] (X) (X) ()()
 			"""
 			increment = increment + 1
-			
+		return target
+
 		
 """	
 class playerComputerHard(playerComputer):
