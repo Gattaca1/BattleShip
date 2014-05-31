@@ -367,8 +367,7 @@ class playerComputerMedium(playerComputer):
 			turn3) _ _ [#] (X) (X) ()()
 			"""
 			increment = increment + 1
-
-		pass
+			
 		
 """	
 class playerComputerHard(playerComputer):
