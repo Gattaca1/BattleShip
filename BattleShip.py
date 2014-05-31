@@ -333,9 +333,12 @@ class playerComputerMedium(playerComputer):
 		target_Added = (False)
 		increment = 1
 		while target_Added == (False):
-			#if increment - 1 isn't a boat hit then don't target incriment
+			previous_Increment = (increment - 1)
+
 			if matching_Vector = 'horizontal':
 				#try increase vector
+				previous_Increased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index + previous_Increment)])
+				if previous_Increased_Vector
 				increased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index + increment)])
 				potential_Targets.append(increased_Vector)
 
