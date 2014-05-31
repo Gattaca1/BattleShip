@@ -34,6 +34,10 @@ class player(object):
 			return (False)
 		else:
 			print 'error in are_Ships_Remaining'
+
+	def is_Target_Valid(self, target):
+		valid = self.firing_Board.valid_Target(target)
+		return valid
 			
 	def enemy_Ship_Coordinate(self, coordinate, ship):
 		pass
@@ -138,7 +142,44 @@ class playerComputer(player):
 					for n in row:
 						if row.index(n) % 2 == 0:
 							self.rand_Queue.append((i + n))
+
+	def all_Adjacent_Coords(self, starting_Coord):
+		column = self.column
+		row = self.row
+
+		starting_Coord_Column_Letter = starting_Coord[:1]
+		starting_Coord_Row_Number = starting_Coord[1:]
+
+		#confirmed hit column index
+		starting_Coord_Column_Index = column.index(starting_Coord_Column_Letter)
+		starting_Coord_Row_Index = row.index(starting_Coord_Row_Number)
+
+		potential_Targets = []
+
+		first_Column_Letter = (column[0])
+		last_Column_Letter = (column[-1])
+		first_Row_Number = (row[0])
+		last_Row_Number = (row[-1])
 		
+		if starting_Coord_Column_Letter != last_Column_Letter:
+			#add 1 to column
+			#C3
+			potential_Targets.append((column[(starting_Coord_Column_Index + 1)] + starting_Coord_Row_Number))
+		if starting_Coord_Column_Letter != first_Column_Letter:
+			#subtract 1 from column
+			#A3
+			potential_Targets.append((column[(starting_Coord_Column_Index - 1)] + starting_Coord_Row_Number))
+		if starting_Coord_Row_Number != last_Row_Number:
+			#add 1 to row
+			#B4
+			potential_Targets.append((starting_Coord_Column_Letter + row[(starting_Coord_Row_Index + 1)]))
+		if starting_Coord_Row_Number != first_Row_Number:
+			#subtract 1 from row
+			#B2
+			potential_Targets.append((starting_Coord_Column_Letter + row[(starting_Coord_Row_Index - 1)]))
+
+		return (potential_Targets)
+
 
 class playerComputerEasy(playerComputer):
 
@@ -168,31 +209,12 @@ class playerComputerEasy(playerComputer):
 			return target
 
 	def future_Targets(self):
-		column = self.column
-		row = self.row
 		#Add area around confirmed hits to a firing queue
-		for item in self.boat_Hit_Log:
-			
+		for confirmed_Hit_Coordinate in self.boat_Hit_Log:
+			potential_Targets = self.all_Adjacent_Coords(confirmed_Hit_Coordinate)
+
 			# Only add it if its not in the queue already
 			# and if it hasn't been shot
-			column_Letter = item[:1]
-			row_Number = item[1:]			
-			column_Pos = column.index(column_Letter)
-			row_Pos = row.index(row_Number)
-			potential_Targets = []
-			
-			if column_Pos != (column.index(column[-1])):
-				#add 1 to column
-				potential_Targets.append((column[(column_Pos + 1)] + row_Number))
-			if column_Pos != (column.index(column[0])):
-				#subtract 1 from column
-				potential_Targets.append((column[(column_Pos - 1)] + row_Number))
-			if row_Pos != (row.index(row[-1])):
-				#add 1 to row
-				potential_Targets.append((column_Letter + row[(row_Pos + 1)]))
-			if row_Pos != (row.index(row[0])):
-				#subtract 1 from row
-				potential_Targets.append((column_Letter + row[(row_Pos - 1)]))
 			
 			for target in potential_Targets:
 				valid = self.firing_Board.valid_Target(target)
@@ -200,11 +222,10 @@ class playerComputerEasy(playerComputer):
 					self.firing_Queue.append(target)
 
 class playerComputerMedium(playerComputer):
-	#If 2 coordinates are known of an enemy ship, you can be pretty sure of its vector. +- vertical/horizontal
+	#If 2 coordinates are known of an enemy ship, you can be sure of its vector (vertical/horizontal).
+	#if 1 coordinate is kown of an enemy ship, gonna have to shoot around to find its vector.
 	#only add 1 thing to the firing queue at a time. that way you never have to derive the logic to decide
 	#if something needs to be removed.
-	#if 1 coordinate is kown of an enemy ship, gonna have to shoot around to find its vector.
-	#could also do a check to see if its within ship length of a wall. that would be a wasted shot potentially
 
 	def __init__(self):
 		playerComputer.__init__(self)
@@ -217,10 +238,14 @@ class playerComputerMedium(playerComputer):
 			self.rand_Queue.remove(coordinate)
 
 	def computer_Logic(self):
-		self.add_Potential_Target_To_Firing_Queue()
+		num_Of_Enemy_Ships_Hit = (len(self.enemy_Ships_And_Their_coordinates))
+
+		if num_Of_Enemy_Ships_Hit >= 1:
+			self.add_Potential_Target_To_Firing_Queue()
+
 		if len(self.firing_Queue) >= 1:
 			target = (self.firing_Queue.pop((len(self.firing_Queue) - 1)))
-			print target
+			print "firing_Queue >= 1 and target is: " + target
 			return target
 		else:
 			target = self.rand_Queue[(randint(0, (len(self.rand_Queue) - 1)))]
@@ -229,63 +254,117 @@ class playerComputerMedium(playerComputer):
 	def add_Potential_Target_To_Firing_Queue(self):
 		#have any ships been hit that are not yet sunk? better try and sink that ship
 		#are two coordinates known, or just one?
-		if (len(self.enemy_Ships_And_Their_coordinates)) >= 1:
-			print self.enemy_Ships_And_Their_coordinates
-			for ship in self.enemy_Ships_And_Their_coordinates:
+		target_Added = (False)
+		can_Target_Be_Added = (True)
 
+		while target_Added == (False) and can_Target_Be_Added == (True):
+
+			for ship in self.enemy_Ships_And_Their_coordinates:
 				num_Of_Coordinates_Hit_On_Ship = len(self.enemy_Ships_And_Their_coordinates[ship])
 				ship_Length = self.ship_Lengths[ship]
+				
 				#see if it has 1 coordinate, or 2+
 				if num_Of_Coordinates_Hit_On_Ship == 1:
 					target = self.rand_Coord_Adjacent_To_Confirmed_Hit(ship)
-					self.firing_Queue.append(target)
-					break
+					valid = self.is_Target_Valid(target)
+
+					if valid == (True):
+						self.firing_Queue.append(target)
+						target_Added = (True)
+
 				elif num_Of_Coordinates_Hit_On_Ship >= 2 and num_Of_Coordinates_Hit_On_Ship < ship_Length:
-					target = self.rand_Coord_Along_Vector_Of_Confirmed_Hit(ship)
-					self.firing_Queue.append(target)
-					break
-				else:
-					break
+					target = self.rand_Coord_Along_Vector_Of_Confirmed_Hits(ship)
+					valid = self.is_Target_Valid(target)
+
+					if valid == (True):
+						self.firing_Queue.append(target)
+						target_Added = (True)
+
+			#Just incase, this breaks the loop
+			can_Target_Be_Added = (False)
 
 	def rand_Coord_Adjacent_To_Confirmed_Hit(self, ship):
-		confirmed_Hit = self.enemy_Ships_And_Their_coordinates[ship][0]
+		# confirmed_Hit = B3
+		# Add to potential_Targets: B2, B4, A3, C3
+		confirmed_Hit_Coordinate = self.enemy_Ships_And_Their_coordinates[ship][0]
+		potential_Targets = self.all_Adjacent_Coords(confirmed_Hit_Coordinate)
+		print "rand_Coord_Adjacent_To_Confirmed_Hit potential_Targets: " + str(potential_Targets)
+		for target in potential_Targets:
+			valid = self.firing_Board.valid_Target(target)
+
+			if valid == (False):
+				potential_Targets.remove(target)
+		print "potential_Targets after non valids removed: " + str(potential_Targets)
+		random_Target = potential_Targets[randint(0, (len(potential_Targets) - 1))]
+		return random_Target
+		
+	def rand_Coord_Along_Vector_Of_Confirmed_Hits(self, ship):
+		"""Will never be executed if ship is already sunk."""
+		#compare 2 confirmed ship coordinates and see if they are in the same column or row
+		#just compare point 1 & 2 and then add and subtract 1 to each and see of those
+		#are in the shot log, but not in the shipHit log
+		#determine the endpoints, and fire at one beyond that.
+		#check to see if the coordinate beyond that is valid (eg, hasn't been shot at yet)
+		#also check to see if the coordinate is at a wall or not
+		first_Confirmed_Coordinate = self.enemy_Ships_And_Their_coordinates[ship][0]
+		second_Confirmed_Coordinate = self.enemy_Ships_And_Their_coordinates[ship][1]
+
+		first_Coordinate_Column_Letter = first_Confirmed_Coordinate[:1]
+		first_Coordinate_Row_Number = first_Confirmed_Coordinate[1:]
+		second_Coordinate_Column_Letter = second_Confirmed_Coordinate[:1]
+		second_Coordinate_Row_Number = second_Confirmed_Coordinate[1:]
+
+		#is the matching vector horizontal or vertical?
+		matching_Vector = ''
+		if first_Coordinate_Column_Letter == second_Coordinate_Column_Letter:
+			matching_Vector = 'horizontal'
+		elif first_Coordinate_Row_Number == second_Coordinate_Row_Number:
+			matching_Vector = 'vertical'
 
 		column = self.column
 		row = self.row
 
-		column_Letter = confirmed_Hit[:1]
-		row_Number = confirmed_Hit[1:]			
-		column_Pos = column.index(column_Letter)
-		row_Pos = row.index(row_Number)
+		first_Coordinate_Column_Index = column.index(first_Coordinate_Column_Letter)
+		first_Coordinate_Row_Index = row.index(first_Coordinate_Row_Number)
+
+		#find the furthest points shot on both ends of the ship
+			#See if 1 past that is in the shot log
 		potential_Targets = []
-		
-		if column_Pos != (column.index(column[-1])):
-			#add 1 to column
-			potential_Targets.append((column[(column_Pos + 1)] + row_Number))
-		if column_Pos != (column.index(column[0])):
-			#subtract 1 from column
-			potential_Targets.append((column[(column_Pos - 1)] + row_Number))
-		if row_Pos != (row.index(row[-1])):
-			#add 1 to row
-			potential_Targets.append((column_Letter + row[(row_Pos + 1)]))
-		if row_Pos != (row.index(row[0])):
-			#subtract 1 from row
-			potential_Targets.append((column_Letter + row[(row_Pos - 1)]))
-		
-		for target in potential_Targets:
-			valid = self.firing_Board.valid_Target(target)
-			if valid == (False):
-				potential_Targets.remove(target)
-		random_Target = potential_Targets[randint(0, (len(potential_Targets) - 1))]
-		return random_Target
-		
-	def rand_Coord_Along_Vector_Of_Confirmed_Hit(self, ship):
-		#compare 2 confirmed ship coordinates and see if they are in the same column or row
-		#determine the endpoints, and fire at one beyond that.
-		#check to see if the coordinate beyond that is valid (eg, hasn't been shot at yet)
+		target_Added = (False)
+		increment = 1
+		while target_Added == (False):
+			#if increment - 1 isn't a boat hit then don't target incriment
+			if matching_Vector = 'horizontal':
+				#try increase vector
+				increased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index + increment)])
+				potential_Targets.append(increased_Vector)
+
+				#try decrease vector
+				decreased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index - increment)])
+				potential_Targets.append(decreased_Vector)
+
+			elif matching_Vector = 'vertical':
+				#try increase vector
+				increased_Vector = (column[(first_Coordinate_Column_Index + increment)] + first_Coordinate_Row_Number)
+				potential_Targets.append(increased_Vector)
+
+				#try decrease vector
+				decreased_Vector = (column[(first_Coordinate_Column_Index - increment)] + first_Coordinate_Row_Number)
+				potential_Targets.append(decreased_Vector)
+
+			for target in potential_Targets:
+				if target in self.enemy_Ships_And_Their_coordinates[ship]:
+					potential_Targets.remove(target)
+				if target in self.shot_Log
+			"""
+			Gotta stop it from doing this:
+			turn1) _ _ [#] (X) (X) _ _ 
+			turn2) _ _ [#] (X) (X) () _
+			turn3) _ _ [#] (X) (X) ()()
+			"""
+			increment = increment + 1
+
 		pass
-
-
 		
 """	
 class playerComputerHard(playerComputer):
@@ -300,10 +379,11 @@ class gameBoard(object):
 		self.column = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
 		self.row = ['1','2','3','4','5','6','7','8','9','10']
 		self.ships = {
-		'Battleship':3,
-		'Submarine':3,
 		'Carrier':5,
-		'Tug':2
+		'Battleship':4,
+		'Cruiser':3,
+		'Submarine':3,
+		'Destroyer':2
 		}
 		
 		self.board = {}
@@ -542,9 +622,7 @@ class gameEngine(object):
 			is_Ship_Sunk = tango.did_Shot_Sink_Boat(boat_Hit)
 			if is_Ship_Sunk == (True):
 				print boat_Hit + " Sunk"
-		
-		##need to somehow get all the ship coordinates from the sunk ship
-		
+				
 		#modify firing board
 		friendly.shot_Fired(destination, is_Boat_Hit)
 				
