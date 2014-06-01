@@ -254,7 +254,7 @@ class playerComputerMedium(playerComputer):
 						self.firing_Queue.append(target)
 						target_Added = (True)
 
-				elif num_Of_Coordinates_Hit_On_Ship >= 2 and num_Of_Coordinates_Hit_On_Ship < ship_Length:
+				if num_Of_Coordinates_Hit_On_Ship >= 2 and num_Of_Coordinates_Hit_On_Ship < ship_Length:
 					target = self.rand_Coord_Along_Vector_Of_Confirmed_Hits(ship)
 					valid = self.is_Target_Valid(target)
 
