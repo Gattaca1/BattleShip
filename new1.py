@@ -73,53 +73,21 @@ enemy_Ship_Coordinate('C3', 'Battleship')
 print enemy_Ships_And_Their_coordinates
 
 print len(enemy_Ships_And_Their_coordinates)
+
+		
+	Difficulty Hard:
+		Determines the probability of ship positions, and shoots at the most likely. When a target is 
+		found, a vector will be determined and shooting will cease once the target is sunk.
+	Computer has 2 AI targeting systems. The first is for when there is no hits have been made,
+		and the second is to sink a ship once one has been found. 
+		
+		The way the first targeting system works is by seeing every way each ship can be arranged on the board, 
+		and assigning the number of positions to each cell. The cell with the highest number of positions 
+		will be the most likely to contain a ship. This will also only fire on every second cell. 
+		
+		The way the second targeting system works is it takes an initial coordinate which is a confirmed 
+		hit. it then determines the 4 points surrounding the hit, and assigns them to be the next targets
+		to shoot at. when one of those 4 points also confirms a hit, and the hit is on the same ship as the
+		original, then the vector has been confirmed. once the vector is confirmed, it will drop the remaining
+		targets from the queue, and make 2 new target coordinates on either endpoint. 
 """
-
-def rand_Coord_Adjacent_To_Confirmed_Hit():
-	# confirmed_Hit = B3
-	# Add to potential_Targets: B2, B4, A3, C3
-	confirmed_Hit_Coordinate = 'B3'
-
-	#column = self.column
-	#row = self.row
-
-	confirmed_Hit_Column_Letter = confirmed_Hit_Coordinate[:1]
-	confirmed_Hit_Row_Number = confirmed_Hit_Coordinate[1:]
-
-	#confirmed hit column index
-	confirmed_Hit_Column_Index = column.index(confirmed_Hit_Column_Letter)
-	confirmed_Hit_Row_Index = row.index(confirmed_Hit_Row_Number)
-
-	potential_Targets = []
-
-	first_Column_Letter = (column[0])
-	last_Column_Letter = (column[-1])
-	first_Row_Number = (row[0])
-	last_Row_Number = (row[-1])
-	
-	if confirmed_Hit_Column_Letter != last_Column_Letter:
-		#add 1 to column
-		#C3
-		potential_Targets.append((column[(confirmed_Hit_Column_Index + 1)] + confirmed_Hit_Row_Number))
-	if confirmed_Hit_Column_Letter != first_Column_Letter:
-		#subtract 1 from column
-		#A3
-		potential_Targets.append((column[(confirmed_Hit_Column_Index - 1)] + confirmed_Hit_Row_Number))
-	if confirmed_Hit_Row_Number != last_Row_Number:
-		#add 1 to row
-		#B4
-		potential_Targets.append((confirmed_Hit_Column_Letter + row[(confirmed_Hit_Row_Index + 1)]))
-	if confirmed_Hit_Row_Number != first_Row_Number:
-		#subtract 1 from row
-		#B2
-		potential_Targets.append((confirmed_Hit_Column_Letter + row[(confirmed_Hit_Row_Index - 1)]))
-
-	print potential_Targets
-
-
-target_Added = (False)
-while target_Added == (False):
-	for (i = 0, i < 10, i++):
-		#increase vector loop
-		#decrease vector loop
-		print 'Incriment = ' + str(i)

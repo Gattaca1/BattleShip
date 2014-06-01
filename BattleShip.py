@@ -80,31 +80,14 @@ class playerComputer(player):
 	Difficulty Medium:
 		Shoots every other square until a target is hit. Determines the ships vector and discontinues
 		shooting when the ship has sunk.
-		
-	Difficulty Hard:
-		Determines the probability of ship positions, and shoots at the most likely. When a target is 
-		found, a vector will be determined and shooting will cease once the target is sunk.
-		
-	"""
-	"""Computer has 2 AI targeting systems. The first is for when there is no hits have been made,
-		and the second is to sink a ship once one has been found. 
-		
-		The way the first targeting system works is by seeing every way each ship can be arranged on the board, 
-		and assigning the number of positions to each cell. The cell with the highest number of positions 
-		will be the most likely to contain a ship. This will also only fire on every second cell. 
-		
-		The way the second targeting system works is it takes an initial coordinate which is a confirmed 
-		hit. it then determines the 4 points surrounding the hit, and assigns them to be the next targets
-		to shoot at. when one of those 4 points also confirms a hit, and the hit is on the same ship as the
-		original, then the vector has been confirmed. once the vector is confirmed, it will drop the remaining
-		targets from the queue, and make 2 new target coordinates on either endpoint. 
 		"""
 	def __init__(self):
 		player.__init__(self)
 		self.enemy_Ships_And_Their_coordinates = {}
 		self.rand_Queue = []		
 		self.firing_Queue = []		
-		self.shot_Log = []
+		self.shot_Log = []		
+		self.boat_Hit_Log = []
 		self.column = self.firing_Board.column
 		self.row = self.firing_Board.row
 		self.ship_Lengths = self.firing_Board.ships
@@ -185,7 +168,6 @@ class playerComputerEasy(playerComputer):
 
 	def __init__(self):
 		playerComputer.__init__(self)
-		self.boat_Hit_Log = []
 		self.generate_Random_Queue_Targets()		
 		
 	def shot_Fired(self, coordinate, is_Boat_Hit):
@@ -243,9 +225,9 @@ class playerComputerMedium(playerComputer):
 		if num_Of_Enemy_Ships_Hit >= 1:
 			self.add_Potential_Target_To_Firing_Queue()
 
-		if len(self.firing_Queue) >= 1:
-			target = (self.firing_Queue.pop((len(self.firing_Queue) - 1)))
-			print "firing_Queue >= 1 and target is: " + target
+		if len(self.firing_Queue) != 0:
+			target = (self.firing_Queue.pop(-1))
+			print "firing_Queue != 0 and target is: " + target
 			return target
 		else:
 			target = self.rand_Queue[(randint(0, (len(self.rand_Queue) - 1)))]
@@ -346,44 +328,52 @@ class playerComputerMedium(playerComputer):
 			if matching_Vector == 'horizontal':
 				#try increase vector
 				previous_Increased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index + previous_Increment)])
-				if previous_Increased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:					
-					increased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index + increment)])
-					if increased_Vector not in self.shot_Log:
-						valid = self.is_Target_Valid(increased_Vector)
-						if valid == (True):
-							target = increased_Vector
-							target_Added = (True)
+				if previous_Increased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
+					#don't let the increased vector try and be more than the length of the row
+					if (first_Coordinate_Row_Index + increment) < (len(row) - 1):			
+						increased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index + increment)])
+						if increased_Vector not in self.shot_Log:
+							valid = self.is_Target_Valid(increased_Vector)
+							if valid == (True):
+								target = increased_Vector
+								target_Added = (True)
 
 				#try decrease vector
 				previous_Decreased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index - previous_Increment)])
 				if previous_Decreased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
-					decreased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index - increment)])
-					if decreased_Vector not in self.shot_Log:
-						valid = self.is_Target_Valid(decreased_Vector)
-						if valid == (True):
-							target = increased_Vector
-							target_Added = (True)
+					#dont let the decreased vector try and be less than the length of the row
+					if (first_Coordinate_Row_Index - increment) >= (0):
+						decreased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index - increment)])
+						if decreased_Vector not in self.shot_Log:
+							valid = self.is_Target_Valid(decreased_Vector)
+							if valid == (True):
+								target = increased_Vector
+								target_Added = (True)
 
 			elif matching_Vector == 'vertical':
 				#try increase vector
 				previous_Increased_Vector = (column[(first_Coordinate_Column_Index + previous_Increment)] + first_Coordinate_Row_Number)
 				if previous_Increased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
-					increased_Vector = (column[(first_Coordinate_Column_Index + increment)] + first_Coordinate_Row_Number)
-					if increased_Vector not in self.shot_Log:
-						valid = self.is_Target_Valid(increased_Vector)
-						if valid == (True):
-							target = increased_Vector
-							target_Added = (True)
+					#dont let the increased vector try and be more than the length of the column
+					if (first_Coordinate_Column_Index + increment) < (len(column) - 1):
+						increased_Vector = (column[(first_Coordinate_Column_Index + increment)] + first_Coordinate_Row_Number)
+						if increased_Vector not in self.shot_Log:
+							valid = self.is_Target_Valid(increased_Vector)
+							if valid == (True):
+								target = increased_Vector
+								target_Added = (True)
 
 				#try decrease vector
 				previous_Decreased_Vector = (column[(first_Coordinate_Column_Index - previous_Increment)] + first_Coordinate_Row_Number)
 				if previous_Decreased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
-					decreased_Vector = (column[(first_Coordinate_Column_Index - increment)] + first_Coordinate_Row_Number)
-					if decreased_Vector not in self.shot_Log:
-						valid = self.is_Target_Valid(decreased_Vector)
-						if valid == (True):
-							target = decreased_Vector
-							target_Added = (True)
+					#dont let the decreased vector try and be less than the length of the column
+					if (first_Coordinate_Column_Index - increment) >= (0):
+						decreased_Vector = (column[(first_Coordinate_Column_Index - increment)] + first_Coordinate_Row_Number)
+						if decreased_Vector not in self.shot_Log:
+							valid = self.is_Target_Valid(decreased_Vector)
+							if valid == (True):
+								target = decreased_Vector
+								target_Added = (True)
 			
 			"""
 			Gotta stop it from doing this:
