@@ -288,6 +288,18 @@ class playerComputerMedium(playerComputer):
 		#determine the endpoints, and fire at one beyond that.
 		#check to see if the coordinate beyond that is valid (eg, hasn't been shot at yet)
 		#also check to see if the coordinate is at a wall or not
+
+		"""
+		vector = determine_Vector(ship)
+		target = coordinate_Along_vector(ship, vector)
+		target_Valid = is_Target_Valid(target)
+		if target_Valid == (True):
+			return target
+		"""
+		
+
+		matching_Vector = self.determine_Vector(ship)
+
 		first_Confirmed_Coordinate = self.enemy_Ships_And_Their_coordinates[ship][0]
 		second_Confirmed_Coordinate = self.enemy_Ships_And_Their_coordinates[ship][1]
 
@@ -295,13 +307,6 @@ class playerComputerMedium(playerComputer):
 		first_Coordinate_Row_Number = first_Confirmed_Coordinate[1:]
 		second_Coordinate_Column_Letter = second_Confirmed_Coordinate[:1]
 		second_Coordinate_Row_Number = second_Confirmed_Coordinate[1:]
-
-		#is the matching vector horizontal or vertical?
-		matching_Vector = ''
-		if first_Coordinate_Column_Letter == second_Coordinate_Column_Letter:
-			matching_Vector = 'horizontal'
-		elif first_Coordinate_Row_Number == second_Coordinate_Row_Number:
-			matching_Vector = 'vertical'
 
 		column = self.column
 		row = self.row
@@ -327,10 +332,10 @@ class playerComputerMedium(playerComputer):
 
 			if matching_Vector == 'horizontal':
 				#try increase vector
-				previous_Increased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index + previous_Increment)])
-				if previous_Increased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
-					#don't let the increased vector try and be more than the length of the row
-					if (first_Coordinate_Row_Index + increment) < (len(row) - 1):			
+				if (first_Coordinate_Row_Index + increment) <= (len(row) - 1):			
+					previous_Increased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index + previous_Increment)])
+					if previous_Increased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
+						#don't let the increased vector try and be more than the length of the row
 						increased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index + increment)])
 						if increased_Vector not in self.shot_Log:
 							valid = self.is_Target_Valid(increased_Vector)
@@ -339,10 +344,10 @@ class playerComputerMedium(playerComputer):
 								target_Added = (True)
 
 				#try decrease vector
-				previous_Decreased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index - previous_Increment)])
-				if previous_Decreased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
-					#dont let the decreased vector try and be less than the length of the row
-					if (first_Coordinate_Row_Index - increment) >= (0):
+				if (first_Coordinate_Row_Index - increment) >= (0):
+					previous_Decreased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index - previous_Increment)])
+					if previous_Decreased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
+						#dont let the decreased vector try and be less than the length of the row
 						decreased_Vector = (first_Coordinate_Column_Letter + row[(first_Coordinate_Row_Index - increment)])
 						if decreased_Vector not in self.shot_Log:
 							valid = self.is_Target_Valid(decreased_Vector)
@@ -352,10 +357,11 @@ class playerComputerMedium(playerComputer):
 
 			elif matching_Vector == 'vertical':
 				#try increase vector
-				previous_Increased_Vector = (column[(first_Coordinate_Column_Index + previous_Increment)] + first_Coordinate_Row_Number)
-				if previous_Increased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
-					#dont let the increased vector try and be more than the length of the column
-					if (first_Coordinate_Column_Index + increment) < (len(column) - 1):
+
+				if (first_Coordinate_Column_Index + increment) <= (len(column) - 1):
+					previous_Increased_Vector = (column[(first_Coordinate_Column_Index + previous_Increment)] + first_Coordinate_Row_Number)
+					if previous_Increased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
+						#dont let the increased vector try and be more than the length of the column
 						increased_Vector = (column[(first_Coordinate_Column_Index + increment)] + first_Coordinate_Row_Number)
 						if increased_Vector not in self.shot_Log:
 							valid = self.is_Target_Valid(increased_Vector)
@@ -364,10 +370,9 @@ class playerComputerMedium(playerComputer):
 								target_Added = (True)
 
 				#try decrease vector
-				previous_Decreased_Vector = (column[(first_Coordinate_Column_Index - previous_Increment)] + first_Coordinate_Row_Number)
-				if previous_Decreased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
-					#dont let the decreased vector try and be less than the length of the column
-					if (first_Coordinate_Column_Index - increment) >= (0):
+				if (first_Coordinate_Column_Index - increment) >= (0):
+					previous_Decreased_Vector = (column[(first_Coordinate_Column_Index - previous_Increment)] + first_Coordinate_Row_Number)
+					if previous_Decreased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
 						decreased_Vector = (column[(first_Coordinate_Column_Index - increment)] + first_Coordinate_Row_Number)
 						if decreased_Vector not in self.shot_Log:
 							valid = self.is_Target_Valid(decreased_Vector)
@@ -383,6 +388,23 @@ class playerComputerMedium(playerComputer):
 			"""
 			increment = increment + 1
 		return target
+
+	def determine_Vector(self, ship):
+		first_Confirmed_Coordinate = self.enemy_Ships_And_Their_coordinates[ship][0]
+		second_Confirmed_Coordinate = self.enemy_Ships_And_Their_coordinates[ship][1]
+
+		first_Coordinate_Column_Letter = first_Confirmed_Coordinate[:1]
+		first_Coordinate_Row_Number = first_Confirmed_Coordinate[1:]
+
+		second_Coordinate_Column_Letter = second_Confirmed_Coordinate[:1]
+		second_Coordinate_Row_Number = second_Confirmed_Coordinate[1:]
+
+		if first_Coordinate_Column_Letter == second_Coordinate_Column_Letter:
+			matching_Vector = 'horizontal'
+		elif first_Coordinate_Row_Number == second_Coordinate_Row_Number:
+			matching_Vector = 'vertical'
+
+		return matching_Vector
 
 		
 """	
