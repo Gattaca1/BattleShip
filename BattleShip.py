@@ -245,7 +245,6 @@ class playerComputerMedium(playerComputer):
 
 		if len(self.firing_Queue) > (0):
 			target = (self.firing_Queue.pop(-1))
-			print "length of firing_Queue > 0 and target is: " + target
 			return target
 		else:
 			target = self.rand_Queue[(randint(0, (len(self.rand_Queue) - 1)))]
@@ -258,8 +257,6 @@ class playerComputerMedium(playerComputer):
 		for ship in self.enemy_Ships_And_Their_coordinates:
 			num_Of_Coordinates_Hit_On_Ship = len(self.enemy_Ships_And_Their_coordinates[ship])
 			ship_Length = self.ship_Lengths[ship]
-			print "num of coordinates hit on " + ship + " = " + str(num_Of_Coordinates_Hit_On_Ship)
-			print ship + " Length = " + str(ship_Length)
 
 			if num_Of_Coordinates_Hit_On_Ship != ship_Length:			
 				#see if it has 1 coordinate, or 2+
@@ -267,29 +264,25 @@ class playerComputerMedium(playerComputer):
 					target = self.rand_Coord_Adjacent_To_Confirmed_Hit(ship)
 
 				elif num_Of_Coordinates_Hit_On_Ship < ship_Length:
-					print "Num of coordinates hit < ship length"
 					target = self.rand_Coord_Along_Vector_Of_Confirmed_Hits(ship)
-					print "target along vector of confirmed hits = " + target
 				else:
 					print "error in add_Potential_Target_To_Firing_Queue"
 				valid = self.is_Target_Valid(target)
 				if valid == (True):
 					self.firing_Queue.append(target)
 			else:
-				print ship + " is sunk."
+				pass
 
 	def rand_Coord_Adjacent_To_Confirmed_Hit(self, ship):
 		# confirmed_Hit = B3
 		# Add to potential_Targets: B2, B4, A3, C3
 		confirmed_Hit_Coordinate = self.enemy_Ships_And_Their_coordinates[ship][0]
 		potential_Targets = self.all_Adjacent_Coords(confirmed_Hit_Coordinate)
-		print "rand_Coord_Adjacent_To_Confirmed_Hit potential_Targets: " + str(potential_Targets)
 		for target in potential_Targets:
 			valid = self.is_Target_Valid(target)
 
 			if valid == (False):
 				potential_Targets.remove(target)
-		print "potential_Targets after non valids removed: " + str(potential_Targets)
 		random_Target = potential_Targets[randint(0, (len(potential_Targets) - 1))]
 		return random_Target
 		
@@ -305,41 +298,6 @@ class playerComputerMedium(playerComputer):
 		target_Valid = self.is_Target_Valid(target)
 		if target_Valid == (True):
 			return target
-		"""
-		Every Case:
-		target ship = [B1, B2, B3, B4]
-		1)
-				1    2    3    4    5
-			A
-
-			B  (#)  (#)  (#)  (#)  ( )
-
-			C
-
-		2)
-				1    2    3    4    5
-			A                      (#)
-
-			B  (#)  (#)  (#)  (#)  (#)
-
-			C                      (#)
-
-		3)
-				1    2    3    4    5
-			A
-
-			B  (#)  (#)  (#)  (#)  
-
-			C
-
-		4)
-				6    7    8    9   10
-			A
-
-			B       (#)  (#)  (#)  (#)
-
-			C
-		"""
 
 	def determine_Vector(self, ship):
 		first_Confirmed_Coordinate = self.enemy_Ships_And_Their_coordinates[ship][0]
