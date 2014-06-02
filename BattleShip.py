@@ -165,12 +165,12 @@ class playerComputer(player):
 		return (potential_Targets)
 
 	def is_Target_Valid(self, target):
-		valid = (False)
-		target_Not_Hit_In_Firing_Board = self.firing_Board.valid_Target(target)
+		valid_Firing_Board = self.firing_Board.valid_Target(target)
 		target_In_Shot_Log = self.is_Target_Shot_At(target)
-		if target_Not_Hit_In_Firing_Board == (True) and target_In_Shot_Log == (False):
-			valid = (True)
-		return valid
+		if valid_Firing_Board == (True) and target_In_Shot_Log == (False):
+			return (True)
+		else:
+			return (False)
 
 	def is_Target_Shot_At(self, target):
 		target_Shot_At = (False)
@@ -275,8 +275,8 @@ class playerComputerMedium(playerComputer):
 				valid = self.is_Target_Valid(target)
 				if valid == (True):
 					self.firing_Queue.append(target)
-					break
-			print ship + " is sunk."
+			else:
+				print ship + " is sunk."
 
 	def rand_Coord_Adjacent_To_Confirmed_Hit(self, ship):
 		# confirmed_Hit = B3
