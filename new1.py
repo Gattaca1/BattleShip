@@ -1,39 +1,23 @@
+from sys import exit
+from random import randint
 """
-class myEggs(object):
-	def __init__(self):
-		self.cock = '-1'
+	Difficulty Hard:
+		Determines the probability of ship positions, and shoots at the most likely. When a target is 
+		found, a vector will be determined and shooting will cease once the target is sunk.
+	Computer has 2 AI targeting systems. The first is for when there is no hits have been made,
+		and the second is to sink a ship once one has been found. 
 		
-	def shit_Stain(self):
-		print 'Open My Eggs'
+		The way the first targeting system works is by seeing every way each ship can be arranged on the board, 
+		and assigning the number of positions to each cell. The cell with the highest number of positions 
+		will be the most likely to contain a ship. This will also only fire on every second cell. 
 		
-	def pregnant(self):
-		print "i've got bad news 4 u"
-		
-		
-class subHub(myEggs):
-	def __init__(self):
-		self.vaselineslug = 'lets slide around on the floor'
-		myEggs.__init__(self)
-		
-	def shit_Stain(self):
-		print 'Sub the shit Stain Hub'
-		
-	def print_Cock(self):
-		print self.cock
-		
-	def print_Vaseline_Slug(self):
-		print self.vaselineslug
-		
-		
-ballsack = subHub()
-ballsack.shit_Stain() #sub the shit stain hub
-ballsack.pregnant() #i've got bad news 4 u
-ballsack.print_Cock() #-1
-ballsack.print_Vaseline_Slug() #lets slide around on the floor
+		The way the second targeting system works is it takes an initial coordinate which is a confirmed 
+		hit. it then determines the 4 points surrounding the hit, and assigns them to be the next targets
+		to shoot at. when one of those 4 points also confirms a hit, and the hit is on the same ship as the
+		original, then the vector has been confirmed. once the vector is confirmed, it will drop the remaining
+		targets from the queue, and make 2 new target coordinates on either endpoint. 
+"""
 
-nutsack = myEggs()
-nutsack.shit_Stain() #open my eggs
-"""
 
 column = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
 row = ['1','2','3','4','5','6','7','8','9','10']
@@ -50,7 +34,7 @@ for letter in column:
 	print strToPrint
 	print ''
 """
-"""
+
 
 enemy_Ships_And_Their_coordinates = {}
 ship_Lengths = {
@@ -70,24 +54,12 @@ enemy_Ship_Coordinate('A2', 'Tug')
 enemy_Ship_Coordinate('A3', 'Battleship')
 enemy_Ship_Coordinate('B3', 'Battleship')
 enemy_Ship_Coordinate('C3', 'Battleship')
-print enemy_Ships_And_Their_coordinates
+firing_Queue = []
+#print enemy_Ships_And_Their_coordinates
 
-print len(enemy_Ships_And_Their_coordinates)
+#print len(enemy_Ships_And_Their_coordinates)
 
-		
-	Difficulty Hard:
-		Determines the probability of ship positions, and shoots at the most likely. When a target is 
-		found, a vector will be determined and shooting will cease once the target is sunk.
-	Computer has 2 AI targeting systems. The first is for when there is no hits have been made,
-		and the second is to sink a ship once one has been found. 
-		
-		The way the first targeting system works is by seeing every way each ship can be arranged on the board, 
-		and assigning the number of positions to each cell. The cell with the highest number of positions 
-		will be the most likely to contain a ship. This will also only fire on every second cell. 
-		
-		The way the second targeting system works is it takes an initial coordinate which is a confirmed 
-		hit. it then determines the 4 points surrounding the hit, and assigns them to be the next targets
-		to shoot at. when one of those 4 points also confirms a hit, and the hit is on the same ship as the
-		original, then the vector has been confirmed. once the vector is confirmed, it will drop the remaining
-		targets from the queue, and make 2 new target coordinates on either endpoint. 
-"""
+
+#for ship in enemy_Ships_And_Their_coordinates:
+#	print ship
+print len(firing_Queue)
