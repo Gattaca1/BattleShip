@@ -17,10 +17,6 @@ from random import randint
 		original, then the vector has been confirmed. once the vector is confirmed, it will drop the remaining
 		targets from the queue, and make 2 new target coordinates on either endpoint. 
 """
-
-
-column = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
-row = ['1','2','3','4','5','6','7','8','9','10']
 """
 tempStr = ''
 for num in row:
@@ -34,6 +30,10 @@ for letter in column:
 	print strToPrint
 	print ''
 """
+"""
+column = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
+row = ['1','2','3','4','5','6','7','8','9','10']
+
 
 
 enemy_Ships_And_Their_coordinates = {}
@@ -63,3 +63,11 @@ firing_Queue = []
 #for ship in enemy_Ships_And_Their_coordinates:
 #	print ship
 print len(firing_Queue)
+"""
+
+randTargets = ['A1', 'B2', 'C3', 'D4', 'E5']
+
+target = randTargets.pop(randint(0, (len(randTargets) - 1)))
+print target
+
+

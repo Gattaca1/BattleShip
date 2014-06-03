@@ -7,8 +7,8 @@ class player(object):
 		self.ship_Board = shipBoard()
 		self.firing_Board = firingBoard()
 				
-	def shot_Fired(self, shot, boat):
-		self.firing_Board.shoot_Target(shot, boat)		
+	def shot_Fired(self, coordinate, is_Boat_Hit):
+		self.firing_Board.shoot_Target(coordinate, is_Boat_Hit)		
 		
 	def shot_Received(self, coordinates):
 		#modify ship board
@@ -103,12 +103,27 @@ class playerComputer(player):
 		
 		print "[Computer]> " + target
 		return target
+
+	def computer_Logic(self):
+		self.find_Future_Targets()
+		target = self.generate_Target()
+		return target
+
+	def generate_Target(self):			
+		if len(self.firing_Queue) > (0):		
+			target = self.firing_Queue.pop(randint(0, (len(self.firing_Queue) - 1)))
+			return target			
+		else:
+			target = self.rand_Queue.pop(randint(0, (len(self.rand_Queue) - 1)))
+			return target
 		
 	def enemy_Ship_Coordinate(self, coordinate, ship):
 		"""Create a link between an enemy ship and a coordinate"""
 		if ship not in self.enemy_Ships_And_Their_coordinates:
 			self.enemy_Ships_And_Their_coordinates[ship] = []
-		self.enemy_Ships_And_Their_coordinates[ship].append(coordinate)
+			self.enemy_Ships_And_Their_coordinates[ship].append(coordinate)
+		else:
+			self.enemy_Ships_And_Their_coordinates[ship].append(coordinate)
 
 	def generate_Random_Queue_Targets(self):
 		column = self.column
@@ -173,39 +188,25 @@ class playerComputer(player):
 			return (False)
 
 	def is_Target_Shot_At(self, target):
-		target_Shot_At = (False)
 		if target in self.shot_Log:
-			target_Shot_At = (True)
-		return target_Shot_At
+			return (True)
+		else:
+			return (False)
+
+	def shot_Fired(self, coordinate, is_Boat_Hit):
+		self.firing_Board.shoot_Target(coordinate, is_Boat_Hit)
+		self.shot_Log.append(coordinate)	
+		if is_Boat_Hit == (True):
+			self.boat_Hit_Log.append(coordinate)	
 
 
 class playerComputerEasy(playerComputer):
 
 	def __init__(self):
 		playerComputer.__init__(self)
-		self.generate_Random_Queue_Targets()		
-		
-	def shot_Fired(self, coordinate, is_Boat_Hit):
-		self.firing_Board.shoot_Target(coordinate, is_Boat_Hit)
-		self.shot_Log.append(coordinate)
-		if coordinate in self.rand_Queue:
-			self.rand_Queue.remove(coordinate)		
-		if is_Boat_Hit == (True):
-			self.boat_Hit_Log.append(coordinate)	
+		self.generate_Random_Queue_Targets()	
 
-	def computer_Logic(self):	
-		#Add items to the firing queue
-		self.future_Targets()
-		
-		if self.firing_Queue != []:		
-			target = randint(0, (len(self.firing_Queue) - 1))
-			return (self.firing_Queue.pop(target))
-			
-		else:
-			target = self.rand_Queue[(randint(0, (len(self.rand_Queue) - 1)))]
-			return target
-
-	def future_Targets(self):
+	def find_Future_Targets(self):
 		#Add area around confirmed hits to a firing queue
 		for confirmed_Hit_Coordinate in self.boat_Hit_Log:
 			potential_Targets = self.all_Adjacent_Coords(confirmed_Hit_Coordinate)
@@ -228,27 +229,13 @@ class playerComputerMedium(playerComputer):
 		playerComputer.__init__(self)
 		self.generate_Random_Queue_Targets()
 
-	def shot_Fired(self, coordinate, is_Boat_Hit):
-		self.firing_Board.shoot_Target(coordinate, is_Boat_Hit)
-		self.shot_Log.append(coordinate)
-		#when the ship targeting system dosn't work right then you can run out of shots here and it errors out
-		if coordinate in self.rand_Queue:
-			self.rand_Queue.remove(coordinate)
-
-	def computer_Logic(self):
+	def find_Future_Targets(self):
 		#grab a target from the firing log. If its empty then default to a random shot.
 
 		num_Of_Enemy_Ships_Hit = (len(self.enemy_Ships_And_Their_coordinates))
 
 		if num_Of_Enemy_Ships_Hit > (0):
 			self.add_Potential_Target_To_Firing_Queue()
-
-		if len(self.firing_Queue) > (0):
-			target = (self.firing_Queue.pop(-1))
-			return target
-		else:
-			target = self.rand_Queue[(randint(0, (len(self.rand_Queue) - 1)))]
-			return target
 
 	def add_Potential_Target_To_Firing_Queue(self):
 		#have any ships been hit that are not yet sunk? better try and sink that ship
