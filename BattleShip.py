@@ -322,36 +322,64 @@ class playerComputerMedium(playerComputer):
 		#ship should be sunk.
 
 		# increase vector
-		increment = 1
-		while increment < ship_Length:			
-			previous_Increment = (increment - 1)
+		increment = 0
+		while increment < ship_Length:
+			increment = (increment + 1)
 
 			# Make sure its not against the right edge
+			previous_Increased_Vector = ''
+			previous_Increment = (increment - 1)
 			if (coordinate_Row_Index + increment) <= (len(row) - 1):			
 				previous_Increased_Vector = (coordinate_Column_Letter + row[(coordinate_Row_Index + previous_Increment)])
-				if previous_Increased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
-					increased_Vector = (coordinate_Column_Letter + row[(coordinate_Row_Index + increment)])
-					if increased_Vector not in self.shot_Log:
-						valid = self.is_Target_Valid(increased_Vector)
-						if valid == (True):
-							return increased_Vector
-			increment = (increment + 1)
+			else:
+				continue
+
+			# If previous vector was a confirmed hit, move right 1
+			increased_Vector = ''	
+			if previous_Increased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
+				increased_Vector = (coordinate_Column_Letter + row[(coordinate_Row_Index + increment)])
+			else:
+				continue
+
+			# Check that the target hasn't already been shot at	
+			valid = (False)
+			if increased_Vector not in self.shot_Log:
+				valid = self.is_Target_Valid(increased_Vector)
+			else:
+				continue
+
+			if valid == (True):
+				return increased_Vector
 
 		# decrease vector
-		increment = 1
+		increment = 0
 		while increment < ship_Length:
-			previous_Increment = (increment - 1)
+			increment = (increment + 1)
 
 			# Make sure its not against the left edge
+			previous_Decreased_Vector = ''
+			previous_Increment = (increment - 1)
 			if (coordinate_Row_Index - increment) >= (0):
 				previous_Decreased_Vector = (coordinate_Column_Letter + row[(coordinate_Row_Index - previous_Increment)])
-				if previous_Decreased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
-					decreased_Vector = (coordinate_Column_Letter + row[(coordinate_Row_Index - increment)])
-					if decreased_Vector not in self.shot_Log:
-						valid = self.is_Target_Valid(decreased_Vector)
-						if valid == (True):
-							return decreased_Vector
-			increment = (increment + 1)
+			else:
+				continue
+
+			# If the previous vector was a confirmed hit, move left 1
+			decreased_Vector = ''	
+			if previous_Decreased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
+				decreased_Vector = (coordinate_Column_Letter + row[(coordinate_Row_Index - increment)])
+			else:
+				continue
+
+			# Check that the target hasn't already been shot at
+			valid = (False)
+			if decreased_Vector not in self.shot_Log:
+				valid = self.is_Target_Valid(decreased_Vector)
+			else:
+				continue
+			
+			if valid == (True):
+				return decreased_Vector
 
 
 	def closest_Coordinate_Along_Vertical_Vector(self, ship):
@@ -372,35 +400,63 @@ class playerComputerMedium(playerComputer):
 		#then fire up until it misses.
 		#ship should be sunk.
 
-		increment = 1
+		increment = 0
 		while increment < ship_Length:
-			previous_Increment = (increment - 1)
+			increment = (increment + 1)
 
 			# Make sure its not against the bottom edge
+			previous_Increased_Vector = ''
+			previous_Increment = (increment - 1)
 			if (coordinate_Column_Index + increment) <= (len(column) - 1):
 				previous_Increased_Vector = (column[(coordinate_Column_Index + previous_Increment)] + coordinate_Row_Number)
-				if previous_Increased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
-					increased_Vector = (column[(coordinate_Column_Index + increment)] + coordinate_Row_Number)
-					if increased_Vector not in self.shot_Log:
-						valid = self.is_Target_Valid(increased_Vector)
-						if valid == (True):
-							return increased_Vector
-			increment = (increment + 1)
+			else:
+				continue
 
-		increment = 1
-		while increment < ship_Length:			
-			previous_Increment = (increment - 1)
+			# If the previous vector was a confirmed hit, move down 1
+			increased_Vector = ''
+			if previous_Increased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
+				increased_Vector = (column[(coordinate_Column_Index + increment)] + coordinate_Row_Number)
+			else:
+				continue
+
+			# Check that the target hasn't already been shot at	
+			valid = (False)
+			if increased_Vector not in self.shot_Log:
+				valid = self.is_Target_Valid(increased_Vector)
+			else:
+				continue
+
+			if valid == (True):
+				return increased_Vector
+
+		increment = 0
+		while increment < ship_Length:
+			increment = (increment + 1)
 
 			# Make sure its not against the top edge
+			previous_Decreased_Vector = ''			
+			previous_Increment = (increment - 1)		
 			if (coordinate_Column_Index - increment) >= (0):
 				previous_Decreased_Vector = (column[(coordinate_Column_Index - previous_Increment)] + coordinate_Row_Number)
-				if previous_Decreased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
-					decreased_Vector = (column[(coordinate_Column_Index - increment)] + coordinate_Row_Number)
-					if decreased_Vector not in self.shot_Log:
-						valid = self.is_Target_Valid(decreased_Vector)
-						if valid == (True):
-							return decreased_Vector
-			increment = (increment + 1)
+			else:
+				continue
+
+			#If the previous vector was a confirmed hit, move up 1
+			decreased_Vector = ''
+			if previous_Decreased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
+				decreased_Vector = (column[(coordinate_Column_Index - increment)] + coordinate_Row_Number)
+			else:
+				continue
+
+			# Check that the target hasn't already been shot at
+			valid = (False)
+			if decreased_Vector not in self.shot_Log:
+				valid = self.is_Target_Valid(decreased_Vector)
+			else:
+				continue
+
+			if valid == (True):
+				return decreased_Vector
 
 		
 """	
