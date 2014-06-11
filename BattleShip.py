@@ -459,12 +459,143 @@ class playerComputerMedium(playerComputer):
 				return decreased_Vector
 
 		
-"""	
-class playerComputerHard(playerComputer):
+
+class playerComputerHard(playerComputer):	
 
 	def __init__(self):
 		playerComputer.__init__(self)
-"""	
+		self.board_Probability = {}
+		self.probability = 0
+		self.weight = 1
+		self.ship_List = self.get_Ship_List()
+
+	def get_Ship_List(self):
+		ships = []
+		for ship, length in self.firing_Board.ships.iteritems():
+			ships.append(str(ship))
+		return ships
+
+	def create_New_Probability_Board(self):
+		# If the dictionary already exists, purge all the values within and recreate
+		# board_Probability = {A1:[probability, weight], A2:[probability, weight]}
+		self.board_Probability = {}
+		for letter in self.column:
+			for num in self.row:
+				self.board_Probability[letter + num] = [(0), (0)]	
+
+	"""	
+	Generate the probability of a ship being in each spot on the board and assign that to board_Probability
+		- only check ships that havn't been sunk.
+		- evaluate all of each ships horizontal positions, starting from the left and moving right.
+			- start at A1. get coords that a ship would cover given its length
+				- if the ship has confirmed coords, then this list needs to contain all of them
+					- the coords in the list that arn't the confirmed hits need to have a weight added to them
+				- if this list contains any discontinuous points, then toss it out
+				- if all the coords are valid, add 1 probability point to each coord.
+			- move to A2 and repeat previous steps
+
+		- evaluate all of each ships vertical positions.
+
+	Shoot at the highest probability position. If theres a tie, take a random from the tie
+		- for each coordinate in all board coordinates, get value
+		- store initial key in firing queue
+		- compare the next coordinates value with the value of coordinate in firing queue
+			- if new coordinate has greater value, then empty the firing queue and add this coord.
+
+	Every turn reevaluate.
+		- purge the probability and weight of each coord.
+	"""
+	def create_Probability_Heat_Map(self):
+		self.create_New_Probability_Board()
+		for ship in self.ship_List:
+			if ship in self.enemy_Ships_And_Their_coordinates:
+				ship_Length = self.ship_Lengths[ship]
+				if len(self.enemy_Ships_And_Their_coordinates[ship]) == ship_Length:
+					continue
+			self.horizontal_Positions(ship)
+			self.vertical_Positions(ship)
+
+	def horizontal_Positions(self, ship):
+		# Generate a list of targets based on the ship and starting coord; and then check if every point in list is valid
+		# If every point is valid, then add 1 to the probability of each coordinate in self.board_Probability
+		ship_Length = self.ship_Lengths[ship]
+		for letter in self.column:
+			for number in self.row:
+				increment = (0)
+				potential_Ship_Position = []
+				while increment < ship_Length:
+					if (self.row.index(number) + ship_Length) <= len(self.row):
+						potential_Ship_Position.append((letter + self.row[(self.row.index(number) + increment)]))
+					increment = increment + 1
+				if bool(potential_Ship_Position) != (False):
+					# Check to see if all the points are valid
+					invalid_Coordinates = self.invalid_Points(ship)
+					if len((set(potential_Ship_Position) - set(invalid_Coordinates))) < len(potential_Ship_Position):
+						continue
+					# If a ship has confirmed hits, make sure they are containted in the potential_Ship_Position
+					confirmed_Hits = []
+					if ship in self.enemy_Ships_And_Their_coordinates:
+						confirmed_Hits = self.enemy_Ships_And_Their_coordinates[ship]
+
+					if len((set(potential_Ship_Position) & set(confirmed_Hits))) == len(confirmed_Hits):
+						# increase the weight and probability of each item from 
+						# potential_Ship_Position (that isnt in confirmed hits)
+						for coordinate in set((set(potential_Ship_Position) ^ set(confirmed_Hits))):
+							self.board_Probability[coordinate][self.probability] = self.board_Probability[coordinate][self.probability] + 1
+							self.board_Probability[coordinate][self.weight] = self.board_Probability[coordinate][self.weight] + 1
+					else:
+						# increase the probability of each item from potential_Ship_Position that 
+						# isnt in confirmed hits
+						for coordinate in set((set(potential_Ship_Position) ^ set(confirmed_Hits))):
+							self.board_Probability[coordinate][self.probability] = self.board_Probability[coordinate][self.probability] + 1
+
+	def vertical_Positions(self, ship):
+		pass
+
+	def invalid_Points(self, ship):
+		invalids = []
+		for coordinate in self.shot_Log:
+			if ship in self.enemy_Ships_And_Their_coordinates:
+				if coordinate not in self.enemy_Ships_And_Their_coordinates[ship]:
+					invalids.append(coordinate)
+		return invalids
+
+	def generate_Probable_Targets(self):
+		# coordinates with a higher weight get priority listing in the firing queue
+		probability = self.probability
+		weight = self.weight
+		for coordinate in self.board_Probability:
+			if coordinate[weight] > 0:
+				self.firing_Queue.append(coordinate)
+		if bool(self.firing_Queue) == (False):
+			# Find the ships with the highest probability number
+			for coordinate in self.board_Probability:
+				if bool(self.firing_Queue) == (False):
+					self.firing_Queue.append(coordinate)
+				elif self.board_Probability[coordinate][probability] == self.board_Probability[(self.firing_Queue[0])][probability]:
+					self.firing_Queue.append(coordinate)
+				elif self.board_Probability[coordinate][probability] > self.board_Probability[(self.firing_Queue[0])][probability]:
+					self.firing_Queue = []
+					self.firing_Queue.append(coordinate)				
+				else:
+					pass
+
+	def find_Future_Targets(self):
+		# Clears the firing queue
+		self.firing_Queue = []
+		# determines probability and weight of each coordinate and assigns it to the probability board
+		self.create_Probability_Heat_Map()
+		# Adds to the firing queue, no return
+		self.generate_Probable_Targets()
+
+	def generate_Target(self):
+		# If the firing queue is not empty, return a random coord from it
+		# Else, error
+		if len(self.firing_Queue) > (0):		
+			target = self.firing_Queue.pop(randint(0, (len(self.firing_Queue) - 1)))
+			return target			
+		else:
+			print 'Erro in generate_Target in playerComputerHard'
 	
 class gameBoard(object):
 
@@ -691,7 +822,7 @@ class gameEngine(object):
 				difficulty_Set = (True)
 				
 			if difficulty == ('HARD'):
-				return playerComputerEasy()
+				return playerComputerHard()
 				difficulty_Set = (True)
 
 				
@@ -772,9 +903,9 @@ def play_Again():
 	restart = ''
 	while restart != 'y' and restart != 'n':
 		print "Play again? answer with y or n"
-		restart = raw_input("> ")
+		restart = raw_input("> ").upper()
 		
-	if restart == 'y':
+	if restart == 'Y':
 		return (True)
 		
 	else:
