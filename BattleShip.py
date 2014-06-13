@@ -6,23 +6,26 @@ class player(object):
 	def __init__(self):
 		self.ship_Board = shipBoard()
 		self.firing_Board = firingBoard()
+		self.shots_Fired_Log = []		
+		self.confirmed_Hit_Log = []
 				
 	def shot_Fired(self, coordinate, is_Boat_Hit):
-		self.firing_Board.shoot_Target(coordinate, is_Boat_Hit)		
+		self.firing_Board.shoot_Target(coordinate, is_Boat_Hit)
+		self.shots_Fired_Log.append(coordinate)	
 		
 	def shot_Received(self, coordinates):
 		#modify ship board
 		boat_Hit = self.ship_Board.shot_incoming(coordinates)
 	
-	def is_Boat_Hit(self, coordinate):
-		boat_Hit = self.ship_Board.is_A_Boat_At_Coordinates(coordinate)
-		return boat_Hit
+	def is_A_Boat_At_Coordinates(self, coordinate):
+		is_Boat = self.ship_Board.is_A_Boat_At_Coordinates(coordinate)
+		return is_Boat
 		
-	def what_Boat_Hit(self, coordinate):
+	def which_Boat_At_Coordinates(self, coordinate):
 		boat = self.ship_Board.ship_At_Coordinates(coordinate)
 		return boat
 		
-	def did_Shot_Sink_Boat(self, ship):
+	def is_Ship_Sunk(self, ship):
 		ship_Sunk = self.ship_Board.is_Ship_Sunk(ship)
 		return ship_Sunk
 		
@@ -39,7 +42,7 @@ class player(object):
 		valid = self.firing_Board.valid_Target(target)
 		return valid
 			
-	def enemy_Ship_Coordinate(self, coordinate, ship):
+	def confirmed_Coordinate_Of_This_Ship(self, coordinate, ship):
 		pass
 	
 class playerHuman(player):
@@ -82,15 +85,32 @@ class playerComputer(player):
 		shooting when the ship has sunk.
 		"""
 	def __init__(self):
-		player.__init__(self)
+		player.__init__(self)		
+		self.random_Target_Queue = []		
+		self.target_Queue = []
+
+		self.column = []
+		self.get_Column_List()
+		self.row = []
+		self.get_Row_List()
+		self.ship_Lengths = {}
+		self.get_Ship_Lengths()
+		self.ship_List = []
+		self.get_Ship_List()
 		self.enemy_Ships_And_Their_coordinates = {}
-		self.rand_Queue = []		
-		self.firing_Queue = []
-		self.shot_Log = []		
-		self.boat_Hit_Log = []
+
+	def get_Column_List(self):
 		self.column = self.firing_Board.column
+
+	def get_Row_List(self):
 		self.row = self.firing_Board.row
+
+	def get_Ship_Lengths(self):
 		self.ship_Lengths = self.firing_Board.ships
+
+	def get_Ship_List(self):
+		for ship, length in self.firing_Board.ships.iteritems():
+			self.ship_List.append(str(ship))
 		
 	def pick_Target(self):
 		# returns the target in format 'A4'
@@ -110,15 +130,16 @@ class playerComputer(player):
 		return target
 
 	def generate_Target(self):			
-		if len(self.firing_Queue) > (0):		
-			target = self.firing_Queue.pop(randint(0, (len(self.firing_Queue) - 1)))
+		if bool(self.target_Queue) == (True):		
+			target = self.target_Queue.pop(randint(0, (len(self.target_Queue) - 1)))
 			return target			
 		else:
-			target = self.rand_Queue.pop(randint(0, (len(self.rand_Queue) - 1)))
+			target = self.random_Target_Queue.pop(randint(0, (len(self.random_Target_Queue) - 1)))
 			return target
 		
-	def enemy_Ship_Coordinate(self, coordinate, ship):
+	def confirmed_Coordinate_Of_This_Ship(self, coordinate, ship):
 		"""Create a link between an enemy ship and a coordinate"""
+		self.confirmed_Hit_Log.append(coordinate)
 		if ship not in self.enemy_Ships_And_Their_coordinates:
 			self.enemy_Ships_And_Their_coordinates[ship] = []
 			self.enemy_Ships_And_Their_coordinates[ship].append(coordinate)
@@ -130,17 +151,17 @@ class playerComputer(player):
 		row = self.row
 		
 		#fire only on every other square
-		if self.rand_Queue == []:
+		if self.random_Target_Queue == []:
 			for i in column:
 				if column.index(i) % 2 == 0:
 					# If column is even, fire on odd row
 					for n in row:
 						if row.index(n) % 2 == 1:
-							self.rand_Queue.append((i + n))
+							self.random_Target_Queue.append((i + n))
 				if column.index(i) % 2 == 1:
 					for n in row:
 						if row.index(n) % 2 == 0:
-							self.rand_Queue.append((i + n))
+							self.random_Target_Queue.append((i + n))
 
 	def all_Adjacent_Coords(self, starting_Coord):
 		column = self.column
@@ -153,7 +174,7 @@ class playerComputer(player):
 		starting_Coord_Column_Index = column.index(starting_Coord_Column_Letter)
 		starting_Coord_Row_Index = row.index(starting_Coord_Row_Number)
 
-		potential_Targets = []
+		adjacent_Coords = []
 
 		first_Column_Letter = (column[0])
 		last_Column_Letter = (column[-1])
@@ -163,21 +184,21 @@ class playerComputer(player):
 		if starting_Coord_Column_Letter != last_Column_Letter:
 			#add 1 to column
 			#C3
-			potential_Targets.append((column[(starting_Coord_Column_Index + 1)] + starting_Coord_Row_Number))
+			adjacent_Coords.append((column[(starting_Coord_Column_Index + 1)] + starting_Coord_Row_Number))
 		if starting_Coord_Column_Letter != first_Column_Letter:
 			#subtract 1 from column
 			#A3
-			potential_Targets.append((column[(starting_Coord_Column_Index - 1)] + starting_Coord_Row_Number))
+			adjacent_Coords.append((column[(starting_Coord_Column_Index - 1)] + starting_Coord_Row_Number))
 		if starting_Coord_Row_Number != last_Row_Number:
 			#add 1 to row
 			#B4
-			potential_Targets.append((starting_Coord_Column_Letter + row[(starting_Coord_Row_Index + 1)]))
+			adjacent_Coords.append((starting_Coord_Column_Letter + row[(starting_Coord_Row_Index + 1)]))
 		if starting_Coord_Row_Number != first_Row_Number:
 			#subtract 1 from row
 			#B2
-			potential_Targets.append((starting_Coord_Column_Letter + row[(starting_Coord_Row_Index - 1)]))
+			adjacent_Coords.append((starting_Coord_Column_Letter + row[(starting_Coord_Row_Index - 1)]))
 
-		return (potential_Targets)
+		return (adjacent_Coords)
 
 	def is_Target_Valid(self, target):
 		valid_Firing_Board = self.firing_Board.valid_Target(target)
@@ -188,16 +209,10 @@ class playerComputer(player):
 			return (False)
 
 	def is_Target_Shot_At(self, target):
-		if target in self.shot_Log:
+		if target in self.shots_Fired_Log:
 			return (True)
 		else:
 			return (False)
-
-	def shot_Fired(self, coordinate, is_Boat_Hit):
-		self.firing_Board.shoot_Target(coordinate, is_Boat_Hit)
-		self.shot_Log.append(coordinate)	
-		if is_Boat_Hit == (True):
-			self.boat_Hit_Log.append(coordinate)	
 
 
 class playerComputerEasy(playerComputer):
@@ -208,7 +223,7 @@ class playerComputerEasy(playerComputer):
 
 	def find_Future_Targets(self):
 		#Add area around confirmed hits to a firing queue
-		for confirmed_Hit_Coordinate in self.boat_Hit_Log:
+		for confirmed_Hit_Coordinate in self.confirmed_Hit_Log:
 			potential_Targets = self.all_Adjacent_Coords(confirmed_Hit_Coordinate)
 
 			# Only add it if its not in the queue already
@@ -216,8 +231,8 @@ class playerComputerEasy(playerComputer):
 			
 			for target in potential_Targets:
 				valid = self.is_Target_Valid(target)
-				if valid == (True) and target not in self.firing_Queue:
-					self.firing_Queue.append(target)
+				if valid == (True) and target not in self.target_Queue:
+					self.target_Queue.append(target)
 
 class playerComputerMedium(playerComputer):
 	#If 2 coordinates are known of an enemy ship, you can be sure of its vector (vertical/horizontal).
@@ -256,7 +271,7 @@ class playerComputerMedium(playerComputer):
 					print "error in add_Potential_Target_To_Firing_Queue"
 				valid = self.is_Target_Valid(target)
 				if valid == (True):
-					self.firing_Queue.append(target)
+					self.target_Queue.append(target)
 			else:
 				pass
 
@@ -343,7 +358,7 @@ class playerComputerMedium(playerComputer):
 
 			# Check that the target hasn't already been shot at	
 			valid = (False)
-			if increased_Vector not in self.shot_Log:
+			if increased_Vector not in self.shots_Fired_Log:
 				valid = self.is_Target_Valid(increased_Vector)
 			else:
 				continue
@@ -373,7 +388,7 @@ class playerComputerMedium(playerComputer):
 
 			# Check that the target hasn't already been shot at
 			valid = (False)
-			if decreased_Vector not in self.shot_Log:
+			if decreased_Vector not in self.shots_Fired_Log:
 				valid = self.is_Target_Valid(decreased_Vector)
 			else:
 				continue
@@ -421,7 +436,7 @@ class playerComputerMedium(playerComputer):
 
 			# Check that the target hasn't already been shot at	
 			valid = (False)
-			if increased_Vector not in self.shot_Log:
+			if increased_Vector not in self.shots_Fired_Log:
 				valid = self.is_Target_Valid(increased_Vector)
 			else:
 				continue
@@ -450,7 +465,7 @@ class playerComputerMedium(playerComputer):
 
 			# Check that the target hasn't already been shot at
 			valid = (False)
-			if decreased_Vector not in self.shot_Log:
+			if decreased_Vector not in self.shots_Fired_Log:
 				valid = self.is_Target_Valid(decreased_Vector)
 			else:
 				continue
@@ -467,22 +482,22 @@ class playerComputerHard(playerComputer):
 		self.board_Probability = {}
 		self.probability = 0
 		self.weight = 1
-		self.ship_List = self.get_Ship_List()
+		self.priority_Target_Queue = []
+		self.probability_Of_Target_Queue_Coordinate = (0)
+		self.ships_Remaining = []
+		self.initialize_Ships_Remaining()
 
-	def get_Ship_List(self):
-		ships = []
-		for ship, length in self.firing_Board.ships.iteritems():
-			ships.append(str(ship))
-		return ships
+	def initialize_Ships_Remaining(self):
+		for ship in self.ship_List:
+			self.ships_Remaining.append(ship)
 
-	def create_New_Probability_Board(self):
-		# If the dictionary already exists, purge all the values within and recreate
-		# board_Probability = {A1:[probability, weight], A2:[probability, weight]}
-		self.board_Probability = {}
-		for letter in self.column:
-			for num in self.row:
-				self.board_Probability[letter + num] = [(0), (0)]	
-
+	def which_Ships_Remaining(self):
+		for ship in self.enemy_Ships_And_Their_coordinates:
+			if len(self.enemy_Ships_And_Their_coordinates[ship]) == self.ship_Lengths[ship]:
+				try:
+					self.ships_Remaining.remove(ship)
+				except:
+					pass
 	"""	
 	Generate the probability of a ship being in each spot on the board and assign that to board_Probability
 		- only check ships that havn't been sunk.
@@ -496,7 +511,8 @@ class playerComputerHard(playerComputer):
 
 		- evaluate all of each ships vertical positions.
 
-	Shoot at the highest probability position. If theres a tie, take a random from the tie
+	Shoot at the coordinate with the highest weight and highest probability. If theres a 
+		tie, take a random from the tie
 		- for each coordinate in all board coordinates, get value
 		- store initial key in firing queue
 		- compare the next coordinates value with the value of coordinate in firing queue
@@ -505,9 +521,9 @@ class playerComputerHard(playerComputer):
 	Every turn reevaluate.
 		- purge the probability and weight of each coord.
 	"""
-	def create_Probability_Heat_Map(self):
-		self.create_New_Probability_Board()
-		for ship in self.ship_List:
+	def determine_Each_Coordinate_Probability(self):
+		self.purge_Then_Generate_Probability_Board()
+		for ship in self.ships_Remaining:
 			if ship in self.enemy_Ships_And_Their_coordinates:
 				ship_Length = self.ship_Lengths[ship]
 				if len(self.enemy_Ships_And_Their_coordinates[ship]) == ship_Length:
@@ -515,84 +531,118 @@ class playerComputerHard(playerComputer):
 			self.horizontal_Positions(ship)
 			self.vertical_Positions(ship)
 
+	def purge_Then_Generate_Probability_Board(self):
+		# If the dictionary already exists, purge all the values within and recreate
+		# board_Probability = {A1:[probability, weight], A2:[probability, weight]}
+		self.board_Probability = {}
+		for letter in self.column:
+			for num in self.row:
+				self.board_Probability[letter + num] = [(0), (0)]	
+
 	def horizontal_Positions(self, ship):
-		# Generate a list of targets based on the ship and starting coord; and then check if every point in list is valid
-		# If every point is valid, then add 1 to the probability of each coordinate in self.board_Probability
+		# Generate every horizontal position a ship can have
 		ship_Length = self.ship_Lengths[ship]
 		for letter in self.column:
 			for number in self.row:
+
 				increment = (0)
 				potential_Ship_Position = []
 				while increment < ship_Length:
 					if (self.row.index(number) + ship_Length) <= len(self.row):
 						potential_Ship_Position.append((letter + self.row[(self.row.index(number) + increment)]))
-					increment = increment + 1
-				if bool(potential_Ship_Position) != (False):
-					# Check to see if all the points are valid
-					invalid_Coordinates = self.invalid_Points(ship)
-					if len((set(potential_Ship_Position) - set(invalid_Coordinates))) < len(potential_Ship_Position):
-						continue
-					# If a ship has confirmed hits, make sure they are containted in the potential_Ship_Position
-					confirmed_Hits = []
-					if ship in self.enemy_Ships_And_Their_coordinates:
-						confirmed_Hits = self.enemy_Ships_And_Their_coordinates[ship]
+					increment += (1)
 
-					if len((set(potential_Ship_Position) & set(confirmed_Hits))) == len(confirmed_Hits):
-						# increase the weight and probability of each item from 
-						# potential_Ship_Position (that isnt in confirmed hits)
-						for coordinate in set((set(potential_Ship_Position) ^ set(confirmed_Hits))):
-							self.board_Probability[coordinate][self.probability] = self.board_Probability[coordinate][self.probability] + 1
-							self.board_Probability[coordinate][self.weight] = self.board_Probability[coordinate][self.weight] + 1
-					else:
-						# increase the probability of each item from potential_Ship_Position that 
-						# isnt in confirmed hits
-						for coordinate in set((set(potential_Ship_Position) ^ set(confirmed_Hits))):
-							self.board_Probability[coordinate][self.probability] = self.board_Probability[coordinate][self.probability] + 1
+				self.add_Coordinates_To_Appropriate_Queue(ship, potential_Ship_Position, ship_Length)
 
 	def vertical_Positions(self, ship):
-		pass
+		# Generate every vertical position a ship can have
+		ship_Length = self.ship_Lengths[ship]
+		for number in self.row:
+			for letter in self.column:
+
+				increment = (0)
+				potential_Ship_Position = []
+				while increment < ship_Length:
+					if (self.column.index(letter) + ship_Length) <= len(self.column):
+						potential_Ship_Position.append((self.column[(self.column.index(letter) + increment)] + number))
+					increment += (1)
+
+				self.add_Coordinates_To_Appropriate_Queue(ship, potential_Ship_Position, ship_Length)
+
+	def add_Coordinates_To_Appropriate_Queue(self, ship, potential_Ship_Position, ship_Length):
+		if len(potential_Ship_Position) == ship_Length:
+			# Check to see if all the points are valid
+			invalid_Coordinates = self.invalid_Points(ship)
+			if len((set(potential_Ship_Position) - set(invalid_Coordinates))) != len(potential_Ship_Position):
+				return
+			ship_Confirmed_Hits = self.ship_Coordinates(ship)
+			if bool(ship_Confirmed_Hits) == (True):
+				# If a ship has confirmed hits, make sure they are all containted in the potential_Ship_Position
+				if len((set(potential_Ship_Position) & set(ship_Confirmed_Hits))) == len(ship_Confirmed_Hits):
+					#set probability and weight
+					for coordinate in ((set(potential_Ship_Position)) - (set(ship_Confirmed_Hits))):
+						self.board_Probability[coordinate][self.probability] += (1)
+						self.board_Probability[coordinate][self.weight] += (1)
+				else:
+					return
+			else:
+				for coordinate in potential_Ship_Position:
+					self.board_Probability[coordinate][self.probability] += (1)
+		else:
+			return
+
+	def ship_Coordinates(self, ship):
+		confirmed_Hits = []
+		if ship in self.enemy_Ships_And_Their_coordinates:
+			confirmed_Hits = self.enemy_Ships_And_Their_coordinates[ship]
+		return confirmed_Hits
 
 	def invalid_Points(self, ship):
 		invalids = []
-		for coordinate in self.shot_Log:
+		for coordinate in self.shots_Fired_Log:
 			if ship in self.enemy_Ships_And_Their_coordinates:
 				if coordinate not in self.enemy_Ships_And_Their_coordinates[ship]:
 					invalids.append(coordinate)
+			else:
+				invalids.append(coordinate)
 		return invalids
 
 	def generate_Probable_Targets(self):
 		# coordinates with a higher weight get priority listing in the firing queue
 		probability = self.probability
 		weight = self.weight
+		# Find the ships with the highest probability number
 		for coordinate in self.board_Probability:
-			if coordinate[weight] > 0:
-				self.firing_Queue.append(coordinate)
-		if bool(self.firing_Queue) == (False):
-			# Find the ships with the highest probability number
-			for coordinate in self.board_Probability:
-				if bool(self.firing_Queue) == (False):
-					self.firing_Queue.append(coordinate)
-				elif self.board_Probability[coordinate][probability] == self.board_Probability[(self.firing_Queue[0])][probability]:
-					self.firing_Queue.append(coordinate)
-				elif self.board_Probability[coordinate][probability] > self.board_Probability[(self.firing_Queue[0])][probability]:
-					self.firing_Queue = []
-					self.firing_Queue.append(coordinate)				
-				else:
-					pass
+			if self.board_Probability[coordinate][weight] > 0:
+				self.priority_Target_Queue.append(coordinate)
+			if bool(self.target_Queue) == (False):
+				self.target_Queue.append(coordinate)
+			elif self.board_Probability[coordinate][probability] == self.board_Probability[(self.target_Queue[0])][probability]:
+				self.target_Queue.append(coordinate)
+			elif self.board_Probability[coordinate][probability] > self.board_Probability[(self.target_Queue[0])][probability]:
+				self.target_Queue = []
+				self.target_Queue.append(coordinate)				
+			else:
+				pass
 
 	def find_Future_Targets(self):
 		# Clears the firing queue
-		self.firing_Queue = []
+		self.target_Queue = []
+		self.priority_Target_Queue = []
+		self.which_Ships_Remaining()
 		# determines probability and weight of each coordinate and assigns it to the probability board
-		self.create_Probability_Heat_Map()
+		self.determine_Each_Coordinate_Probability()
 		# Adds to the firing queue, no return
 		self.generate_Probable_Targets()
 
 	def generate_Target(self):
 		# If the firing queue is not empty, return a random coord from it
 		# Else, error
-		if len(self.firing_Queue) > (0):		
-			target = self.firing_Queue.pop(randint(0, (len(self.firing_Queue) - 1)))
+		if bool(self.priority_Target_Queue) == (True):
+			target = self.priority_Target_Queue.pop(randint(0, (len(self.priority_Target_Queue) - 1)))
+			return target
+		elif len(self.target_Queue) > (0):		
+			target = self.target_Queue.pop(randint(0, (len(self.target_Queue) - 1)))
 			return target			
 		else:
 			print 'Erro in generate_Target in playerComputerHard'
@@ -682,7 +732,6 @@ class shipBoard(gameBoard):
 			return (False)		
 		
 	def ship_Positions_Remaining(self):
-		#old name = ships_Remaining
 		return (len(self.not_Hit_Boat_Occupied_Coordinates))		
 		
 	def initialize_Ships(self):	
@@ -826,29 +875,29 @@ class gameEngine(object):
 				difficulty_Set = (True)
 
 				
-	def shoot(self, friendly, tango, destination):
+	def shoot(self, friendly, tango, coordinate):
 		#was a boat hit?
-		is_Boat_Hit = tango.is_Boat_Hit(destination)
+		is_Boat_At_Coordinate = tango.is_A_Boat_At_Coordinates(coordinate)
 		
 		#shoot
-		tango.shot_Received(destination)
+		tango.shot_Received(coordinate)
 		
 		is_Ship_Sunk = (False)
 		#what boat was hit
-		if is_Boat_Hit == (True):
-			boat_Hit = tango.what_Boat_Hit(destination)
-			print boat_Hit + " Hit"
+		if is_Boat_At_Coordinate == (True):
+			boat_At_Coordinate = tango.which_Boat_At_Coordinates(coordinate)
+			print boat_At_Coordinate + " Hit"
 			
 			#pass the boat name to the friendly player to keep track of boats they've hit
-			friendly.enemy_Ship_Coordinate(destination, boat_Hit)
+			friendly.confirmed_Coordinate_Of_This_Ship(coordinate, boat_At_Coordinate)
 			
 			#did the shot sink the ship
-			is_Ship_Sunk = tango.did_Shot_Sink_Boat(boat_Hit)
-			if is_Ship_Sunk == (True):
-				print boat_Hit + " Sunk"
+			ship_Sunk = tango.is_Ship_Sunk(boat_At_Coordinate)
+			if ship_Sunk == (True):
+				print boat_At_Coordinate + " Sunk"
 				
 		#modify firing board
-		friendly.shot_Fired(destination, is_Boat_Hit)
+		friendly.shot_Fired(coordinate, is_Boat_At_Coordinate)
 				
 	def whose_Turn(self, turn_Count):
 		if turn_Count % 2 == 0:
@@ -858,8 +907,8 @@ class gameEngine(object):
 	def turn_Actions(self, offense, defense):
 		"""return the destination"""
 		#pick target and confirm valid
-		destination = offense.pick_Target()
-		self.shoot(offense, defense, destination)
+		target_Coordinate = offense.pick_Target()
+		self.shoot(offense, defense, target_Coordinate)
 		
 	def is_Game_Over(self, player):
 		if player.are_Ships_Remaining() == (True):
@@ -903,11 +952,10 @@ def play_Again():
 	restart = ''
 	while restart != 'y' and restart != 'n':
 		print "Play again? answer with y or n"
-		restart = raw_input("> ").upper()
+		restart = raw_input("> ")
 		
-	if restart == 'Y':
-		return (True)
-		
+	if restart == 'y':
+		return (True)		
 	else:
 		return (False)
 		

@@ -1,0 +1,92 @@
+class player()
+
+	def init():
+	    self.ship_Board
+	    self.firing_Board
+		self.shots_Fired_Log = []		
+		self.confirmed_Hit_Log = []
+	def are_Ships_Remaining():
+	def is_Target_Valid():
+################### OFFENSIVE TURN FUNCTIONS ##################
+	def shot_Fired():
+	def confirmed_Coordinate_Of_This_Ship():
+################### DEFENSIVE TURN FUNCTIONS ##################
+	def is_A_Boat_At_Coordinates(): 
+	def shot_Received():
+	def which_Boat_At_Coordinates():
+	def is_Ship_Sunk(): 
+
+class playerHuman(player)
+	
+	def display_Boards():
+	def pick_Target():
+	
+class playerComputer(player):
+
+	def init():	    
+	    self.random_Target_Queue = []		
+		self.target_Queue = []
+	    self.column = []
+		self.get_Column_List()
+		self.row = []
+		self.get_Row_List()
+		self.ship_Lengths = {}
+		self.get_Ship_Lengths()
+		self.ship_List = []
+		self.get_Ship_List()
+		self.enemy_Ships_And_Their_coordinates = {}
+	def all_Adjacent_Coords():
+	def computer_Logic():
+	def confirmed_Coordinate_Of_This_Ship():
+	def generate_Target():
+	def generate_Random_Queue_Targets():
+	def get_Column_List():
+	def get_Row_List():
+	def get_Ship_Lengths():
+	def get_Ship_List():
+	def is_Target_Valid():
+	def is_Target_Shot_At():
+	def pick_Target():
+
+class playerComputerEasy(playerComputer):
+
+	def init():
+	    self.generate_Random_Queue_Targets()
+	def find_Future_Targets():
+
+class playerComputerMedium(playerComputer):
+
+	def init():
+	    self.generate_Random_Queue_Targets()
+	def add_Potential_Target_To_Firing_Queue():
+	def closest_Coordinate_Along_Horizontal_Vector():
+	def closest_Coordinate_Along_Vertical_Vector():
+	def determine_Vector():
+	def find_Future_Targets():
+	def rand_Coord_Adjacent_To_Confirmed_Hit():
+	def rand_Coord_Along_Vector_Of_Confirmed_Hits():
+
+class playerHard(playerComputer)
+
+	def init():
+	    self.board_Probability = {}
+	    self.probability = 0
+	    self.weight = 1
+	def purge_Then_Generate_Probability_Board():
+	def determine_Each_Coordinate_Probability():
+#def determine_Each_Coordinate_Weight():
+	def find_Future_Targets():
+	def generate_Probable_Targets():
+	def generate_Target():
+	def horizontal_Positions():
+	def invalid_Points():
+	def vertical_Positions():
+
+Turn actions:
+Pick target -> Shoot target -> Check if game is over
+
+Computer logic:
+look for good targets -> pick one
+
+current taks:
+	
