@@ -121,7 +121,7 @@ class playerComputer(player):
 			valid = self.is_Target_Valid(target)
 			target_Picked = valid
 		
-		print "[Computer]> " + target
+		print "[Opponent]> " + target
 		return target
 
 	def computer_Logic(self):
@@ -886,7 +886,7 @@ class gameEngine(object):
 		#what boat was hit
 		if is_Boat_At_Coordinate == (True):
 			boat_At_Coordinate = tango.which_Boat_At_Coordinates(coordinate)
-			print boat_At_Coordinate + " Hit"
+			print "[Console]> " + boat_At_Coordinate + " Hit"
 			
 			#pass the boat name to the friendly player to keep track of boats they've hit
 			friendly.confirmed_Coordinate_Of_This_Ship(coordinate, boat_At_Coordinate)
@@ -894,8 +894,11 @@ class gameEngine(object):
 			#did the shot sink the ship
 			ship_Sunk = tango.is_Ship_Sunk(boat_At_Coordinate)
 			if ship_Sunk == (True):
-				print boat_At_Coordinate + " Sunk"
-				
+				print "[Console]> " + boat_At_Coordinate + " Sunk"
+			print ""
+		else:
+			print "[Console]> Miss"
+			print ""
 		#modify firing board
 		friendly.shot_Fired(coordinate, is_Boat_At_Coordinate)
 				
