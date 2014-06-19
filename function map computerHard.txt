@@ -89,4 +89,4 @@ Computer logic:
 look for good targets -> pick one
 
 current taks:
-	
+	- Targets in the priority queue will need to be compared to find the highest prob.

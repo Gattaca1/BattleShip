@@ -44,6 +44,9 @@ class player(object):
 			
 	def confirmed_Coordinate_Of_This_Ship(self, coordinate, ship):
 		pass
+
+	def display_Boards(self):
+		pass
 	
 class playerHuman(player):
 
@@ -849,17 +852,31 @@ class firingBoard(gameBoard):
 		
 class gameEngine(object):
 
-	def __init__(self):
-		self.player_Computer = self.select_Difficulty()
-		self.player_Human = playerHuman()
+	def __init__(self):		
+		self.player_Human = self.select_Game_Mode()
+		self.player_Computer = self.initialize_Opponent()
 		self.player_Order = self.player_Turn_Order()
+
+	def select_Game_Mode(self):
+		print "Play vs Computer, or watch Computer vs Computer"
+		print "1 or 2"
+		game_Mode = raw_input("> ")
+		if game_Mode == "1":
+			return playerHuman()
+		elif game_Mode == "2":
+			print "Select player 1 difficulty: Easy, Medium, Hard"
+			return self.select_Difficulty()
+		else:
+			self.select_Game_Mode()
+
+	def initialize_Opponent(self):
+		print "Select opponent difficulty: Easy, Medium, Hard"
+		return self.select_Difficulty()
 		
-	def select_Difficulty(self):
-	
+	def select_Difficulty(self):	
 		difficulty_Set = (False)
 		
 		while difficulty_Set == (False):
-			print "Select difficulty: Easy, Medium, Hard"
 			difficulty = raw_input("> ").upper()
 			
 			if difficulty == ('EASY'):
