@@ -8,6 +8,30 @@ class player(object):
 		self.firing_Board = firingBoard()
 		self.shots_Fired_Log = []		
 		self.confirmed_Hit_Log = []
+		self.not_Hit_Boat_Occupied_Coordinates = [] #old name = self.ships_Left
+		#Things to track
+		# Shots fired, shots connected, starting ship positions, ship positions remaining
+		# 
+			
+		self.ship_Positions = {}
+		self.ships = {
+		'Carrier':5,
+		'Battleship':4,
+		'Cruiser':3,
+		'Submarine':3,
+		'Destroyer':2
+		}
+		self.ship_Positions = {}
+		self.column = []
+		self.get_Column_List()
+		self.row = []
+		self.get_Row_List()
+		self.ship_Lengths = {}
+		self.get_Ship_Lengths()
+		self.ship_List = []
+		self.get_Ship_List()
+
+	################ PUBLIC ################
 				
 	def shot_Fired(self, coordinate, is_Boat_Hit):
 		self.firing_Board.shoot_Target(coordinate, is_Boat_Hit)
@@ -47,6 +71,10 @@ class player(object):
 
 	def display_Boards(self):
 		pass
+
+	################ PRIVATE ################
+
+
 	
 class playerHuman(player):
 
