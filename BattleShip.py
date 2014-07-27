@@ -1,6 +1,6 @@
 from sys import exit
 from random import randint
-from Player import *
+from gameEngine import gameEngine
 	
 def play_Again():
 	
@@ -23,6 +23,5 @@ def initiate_Game():
 		game_Instance.play_Game()
 		start_New_Game = play_Again()
 	exit()
-	
 	
 initiate_Game()

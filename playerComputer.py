@@ -1,3 +1,7 @@
+from sys import exit
+from random import randint
+from player import player
+
 class playerComputer(player):
 	"""
 	Difficulty Easy:
@@ -7,8 +11,11 @@ class playerComputer(player):
 		Shoots every other square until a target is hit. Determines the ships vector and discontinues
 		shooting when the ship has sunk.
 		"""
-	def __init__(self):
-		player.__init__(self)		
+	def __init__(self, column, row, ships):
+		self.column = column
+		self.row = row
+		self.ships = ships
+		player.__init__(self, self.column, self.row, self.ships)	
 		self.random_Target_Queue = []		
 		self.target_Queue = []
 

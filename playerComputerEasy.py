@@ -1,7 +1,12 @@
+from playerComputer import playerComputer
+
 class playerComputerEasy(playerComputer):
 
-	def __init__(self):
-		playerComputer.__init__(self)
+	def __init__(self, column, row, ships):
+		self.column = column
+		self.row = row
+		self.ships = ships
+		playerComputer.__init__(self, self.column, self.row, self.ships)
 		self.generate_Random_Queue_Targets()	
 
 	def find_Future_Targets(self):

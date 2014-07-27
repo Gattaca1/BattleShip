@@ -1,11 +1,16 @@
+from playerComputer import playerComputer
+
 class playerComputerMedium(playerComputer):
 	#If 2 coordinates are known of an enemy ship, you can be sure of its vector (vertical/horizontal).
 	#if 1 coordinate is kown of an enemy ship, gonna have to shoot around to find its vector.
 	#only add 1 thing to the firing queue at a time. that way you never have to derive the logic to decide
 	#if something needs to be removed.
 
-	def __init__(self):
-		playerComputer.__init__(self)
+	def __init__(self, column, row, ships):
+		self.column = column
+		self.row = row
+		self.ships = ships
+		playerComputer.__init__(self, self.column, self.row, self.ships)
 		self.generate_Random_Queue_Targets()
 
 	def find_Future_Targets(self):

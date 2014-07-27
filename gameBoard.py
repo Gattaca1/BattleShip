@@ -43,12 +43,10 @@ class gameBoard(object):
 	def display_Board(self, board_Name):
 		print "						" + board_Name
 		print ""
-		self.board()
+		display_Coordinates()
 
 	def update_Board(self, boat_Coordinates, firing_Coordinates):
-		pass
-
-
-
-		
-		
+		for coordinate in boat_Coordinates:
+			self.board[coordinate][0] == 'boat'
+		for coordinate in firing_Coordinates:
+			self.board[coordinate][1] == 'hit'		

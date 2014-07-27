@@ -1,12 +1,18 @@
-class shipBoard(gameBoard):
+from sys import exit
+from random import randint
 
-	def __init__(self):
-		gameBoard.__init__(self)
-		self.not_Hit_Boat_Occupied_Coordinates = []
-			#old name = self.ships_Left
-		self.ship_Positions = {}
-		self.initialize_Ships()			
-		
+class shipPlacement(object):
+
+	def __init__(self, column, row, ships, all_Board_Coords):
+		self.column = column
+		self.row = row
+		self.ships = ships
+		self.all_Board_Coords = all_Board_Coords
+		self.ship_Names_And_Coordinates = {}
+		self.occupied_Positions = []
+		self.initialize_Ships()
+
+		################ PUBLIC ################
 		
 	def initialize_Ships(self):	
 		for ship in self.ships:		
@@ -20,6 +26,14 @@ class shipBoard(gameBoard):
 				valid = self.validate_Ship_Coordinates(ship_Coordinates)
 				if valid == (True):
 					self.assign_Ship_Coordinates(ship_Coordinates, ship)
+
+	def return_Ship_Names_And_Coordinates(self):
+		return self.ship_Names_And_Coordinates
+
+	def return_All_Occupied_Positions(self):
+		return self.occupied_Positions
+
+		################ PRIVATE ################
 					
 	def random_Coord(self):	
 		#return a random board coordinate
@@ -63,39 +77,37 @@ class shipBoard(gameBoard):
 		row_Val = (initial_Coordinate[1:])
 		col_Val = (initial_Coordinate[:1])
 		ship_Coordinates = []
+
 		i = 0
-		
 		while i < ship_Length:
 			if vector == 'up':
 				#subtract from column
 				ship_Coordinates.append((self.column[(col_Pos - i)] + row_Val))
-				i += 1
-			if vector == 'down':
+			elif vector == 'down':
 				#add to column
 				ship_Coordinates.append((self.column[(col_Pos + i)] + row_Val))
-				i += 1
-			if vector == 'left':
+			elif vector == 'left':
 				#subtract from row
 				ship_Coordinates.append((col_Val + (self.row[(row_Pos - i)])))
-				i += 1
-			if vector == 'right':
+			elif vector == 'right':
 				#add to row
 				ship_Coordinates.append((col_Val + (self.row[(row_Pos + i)])))
-				i += 1
+			i += 1
 		return (ship_Coordinates)		
 		
-	def validate_Ship_Coordinates(self, set_Coordinates):		
-		#return True if valid, False if not valid
+	def validate_Ship_Coordinates(self, set_Coordinates):
 		#a valid set of coordinates is one in which no coordinate in the set is occupied by a ship
-		for coordinate in set_Coordinates:
-			if self.board[coordinate][0] == ('boat'):
-				return (False)		
-		return (True)		
+		#>>> a & b                              # letters in both a and b
+		potential_Coords = set(set_Coordinates)
+		occupied_Coords = set(self.occupied_Positions)
+		common_Coords = potential_Coords & occupied_Coords
+		if len(common_Coords) == (0):
+			return (True)
+		else:
+			return (False)
 		
-	def assign_Ship_Coordinates(self, set_Coordinates, ship):	
+	def assign_Ship_Coordinates(self, ship_Coordinates, ship_Name):	
 		#given a set of coordinates, set each coordinate to occupied by boat
-		self.ship_Positions[ship] = []
-		for coordinate in set_Coordinates:
-			self.board[coordinate][0] = ('boat')
-			self.not_Hit_Boat_Occupied_Coordinates.append(coordinate)
-			self.ship_Positions[ship].append(coordinate)
+		self.ship_Names_And_Coordinates[ship_Name] = ship_Coordinates
+		for coordinate in ship_Coordinates:
+			self.occupied_Positions.append(coordinate)			

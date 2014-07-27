@@ -1,19 +1,20 @@
+from shipPlacement import shipPlacement
+
 class player(object):
 
 	def __init__(self, column, row, ships):
 		self.column = column
 		self.row = row
-		self.ships_And_Lengths = ships
-		# 'Carrier':5,
-		# 'Battleship':4,
-		# 'Cruiser':3,
-		# 'Submarine':3,
-		# 'Destroyer':2	
-		self.all_Coordinates = []
-		self.generate_All_Coordinates()
-		self.ships_And_Associated_Coordinates = {}
+		self.ships_And_Lengths = ships # 'Carrier':5,
+		self.all_Board_Coordinates = []
+		self.generate_All_Board_Coordinates()
+		self.list_Of_Ship_Names = []
+		self.generate_List_Of_Ship_Names()		
+		
+		self.generated_Ship_Coordinates = shipPlacement(self.column, self.row, self.ships_And_Lengths, self.all_Board_Coordinates)
+		
 		self.shots_Fired_Log = []
-		self.shots_Fired_Hit_Log = [] #old name is self.confirmed_Hit_Log
+		self.shots_Fired_Hit_Log = []
 		self.shots_Received_Log = []
 		self.shots_Received_Hit_Log = []
 
@@ -24,12 +25,11 @@ class player(object):
 		# Shots fired, shots connected, 
 		# Shots received, shots received connected
 		# Enemy ships & their coordinates
-
-		self.list_Of_Ships = []
-		self.generate_List_Of_Ships()		
-		self.occupied_Coordinates = []
-		self.generate_List_Of_All_Occupied_Coordinates()
 		
+		self.ships_And_Associated_Coordinates = {}
+		self.get_Ships_And_Associated_Coordinates()
+		self.occupied_Coordinates = []
+		self.get_List_Of_All_Occupied_Coordinates()		
 
 	################ PUBLIC ################
 				
@@ -85,7 +85,7 @@ class player(object):
 		# coordinate must exist
 		# coordinate must not yet be shot at
 		if coordinate not in self.shots_Fired_Log:
-			if coordinate in self.all_Coordinates:
+			if coordinate in self.all_Board_Coordinates:
 				return (True)
 			else:
 				return (False)
@@ -112,18 +112,17 @@ class player(object):
 
 	################ PRIVATE ################
 
-	def generate_List_Of_Ships(self):
+	def generate_List_Of_Ship_Names(self):
 		for ship_Name, ship_Length in self.ships_And_Lengths.iteritems():
-			self.list_Of_Ships.append(ship_Name)
+			self.list_Of_Ship_Names.append(ship_Name)
 
-	def generate_All_Coordinates(self):
+	def generate_All_Board_Coordinates(self):
 		for letter in self.column:
 			for number in self.row:
-				self.all_Coordinates.append(letter + number)
+				self.all_Board_Coordinates.append(letter + number)
 
-	def generate_List_Of_All_Occupied_Coordinates(self):
-		all_Coords = []
-		for ship_Name, list_Of_Coords in self.ships_And_Associated_Coordinates:
-			for coordinate in list_Of_Coords:
-				all_Coords.append(coordinate)
-		return all_Coords
+	def get_List_Of_All_Occupied_Coordinates(self):
+		return self.generated_Ship_Coordinates.return_All_Occupied_Positions()
+
+	def get_Ships_And_Associated_Coordinates(self):
+		return self.generated_Ship_Coordinates.return_Ship_Names_And_Coordinates()

@@ -1,9 +1,14 @@
+from displayBoard import displayBoard
+from player import player
+from playerHuman import playerHuman
+from playerComputer import playerComputer
+from playerComputerEasy import playerComputerEasy
+from playerComputerHard import playerComputerHard
+from playerComputerMedium import playerComputerMedium
+
 class gameEngine(object):
 
-	def __init__(self):		
-		self.player_Human = self.select_Game_Mode()
-		self.player_Computer = self.initialize_Opponent()
-		self.player_Order = self.player_Turn_Order()
+	def __init__(self):
 		self.column = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]
 		self.row = ['1','2','3','4','5','6','7','8','9','10']
 		self.ships = {
@@ -13,13 +18,16 @@ class gameEngine(object):
 		'Submarine':3,
 		'Destroyer':2
 		}
+		self.player_Human = self.select_Game_Mode()
+		self.player_Computer = self.initialize_Opponent()
+		self.player_Order = self.player_Turn_Order()		
 
 	def select_Game_Mode(self):
 		print "Play vs Computer, or watch Computer vs Computer"
 		print "1 or 2"
 		game_Mode = raw_input("> ")
 		if game_Mode == "1":
-			return playerHuman()
+			return playerHuman(self.column, self.row, self.ships)
 		elif game_Mode == "2":
 			print "Select player 1 difficulty: Easy, Medium, Hard"
 			return self.select_Difficulty()
@@ -37,17 +45,16 @@ class gameEngine(object):
 			difficulty = raw_input("> ").upper()
 			
 			if difficulty == ('EASY'):
-				return playerComputerEasy()
+				return playerComputerEasy(self.column, self.row, self.ships)
 				difficulty_Set = (True)
 				
 			if difficulty == ('MEDIUM'):
-				return playerComputerMedium()
+				return playerComputerMedium(self.column, self.row, self.ships)
 				difficulty_Set = (True)
 				
 			if difficulty == ('HARD'):
-				return playerComputerHard()
+				return playerComputerHard(self.column, self.row, self.ships)
 				difficulty_Set = (True)
-
 				
 	def shoot(self, friendly, tango, coordinate):
 		friendly.shot_Fired(coordinate)

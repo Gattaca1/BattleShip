@@ -1,3 +1,5 @@
+from gameBoard import gameBoard
+
 class displayBoard(object):
 
 	def __init__(self, column, row):
@@ -12,7 +14,6 @@ class displayBoard(object):
 		# shots_Fired_Log = all shots received, enemy
 
 		self.firing_Board.update_Board(shots_Fired_Hit_Log, shots_Fired_Log)
-
 		self.ship_Board.update_Board(occupied_Coordinates, shots_Received_Log)
 
 		self.firing_Board.display_Board('Firing Board')
