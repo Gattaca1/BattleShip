@@ -56,45 +56,19 @@ enemy_Ship_Coordinate('B3', 'Battleship')
 enemy_Ship_Coordinate('F4', 'Cruiser')
 firing_Queue = []
 shot_Log = ['A2', 'A3', 'B3', 'F4']
-#print enemy_Ships_And_Their_coordinates
+print enemy_Ships_And_Their_coordinates
 
-#print len(enemy_Ships_And_Their_coordinates)
+print len(enemy_Ships_And_Their_coordinates)
 
-
-#for ship in enemy_Ships_And_Their_coordinates:
-#	print ship
-def invalid_Points(ship):
-	invalids = []
-	for coordinate in shot_Log:
-		if coordinate not in enemy_Ships_And_Their_coordinates[ship]:
-			invalids.append(coordinate)
-	return invalids
 
 for ship in enemy_Ships_And_Their_coordinates:
-	ship_Length = ship_Lengths[ship]
+	print ship
+	print enemy_Ships_And_Their_coordinates[ship]
+
+def generate_All_Coordinates():
 	for letter in column:
 		for number in row:
-			increment = (0)
-			potential_Ship_Position = []
-			while increment < ship_Length:
-				if (row.index(number) + ship_Length) <= len(row):
-					potential_Ship_Position.append((letter + row[(row.index(number) + increment)]))
-				increment = increment + 1
-			
-			if bool(potential_Ship_Position) != (False):
-				
-				# Check to see if all the points are valid
-				invalid_Coordinates = invalid_Points(ship)
-				if len((set(potential_Ship_Position) - set(invalid_Coordinates))) < len(potential_Ship_Position):
-					continue
-				
-				# If a ship has confirmed hits, make sure they are containted in the potential_Ship_Position
-				confirmed_Hits = enemy_Ships_And_Their_coordinates[ship]
-				if len((set(potential_Ship_Position) & set(confirmed_Hits))) == len(confirmed_Hits):
-					# increase the weight and probability of each item from 
-					# potential_Ship_Position (that isnt in confirmed hits)
-					print potential_Ship_Position
-				else:
-					pass
-					# increase the probability of each item from potential_Ship_Position that 
-					# isnt in confirmed hits
+			all_Coordinates.append(letter + number)
+all_Coordinates = []
+generate_All_Coordinates()
+print all_Coordinates
