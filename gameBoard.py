@@ -13,8 +13,7 @@ class gameBoard(object):
 	def create_Board(self):	
 		for letter in self.column:
 			for num in self.row:
-				if board == ('firing'):
-					self.board[letter + num] = ['noBoat', 'noHit']
+				self.board[letter + num] = ['noBoat', 'noHit']
 	
 	def format_Coordinates(self, key):	
 		if self.board[key][0] == 'noBoat' and self.board[key][1] == 'noHit':
@@ -43,10 +42,10 @@ class gameBoard(object):
 	def display_Board(self, board_Name):
 		print "						" + board_Name
 		print ""
-		display_Coordinates()
+		self.display_Coordinates()
 
 	def update_Board(self, boat_Coordinates, firing_Coordinates):
 		for coordinate in boat_Coordinates:
-			self.board[coordinate][0] == 'boat'
+			self.board[coordinate][0] = 'boat'
 		for coordinate in firing_Coordinates:
-			self.board[coordinate][1] == 'hit'		
+			self.board[coordinate][1] = 'hit'		

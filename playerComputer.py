@@ -1,47 +1,13 @@
-from sys import exit
 from random import randint
 from player import player
 
 class playerComputer(player):
-	"""
-	Difficulty Easy:
-		Shoots every other square until a Target is hit. Fires around the entirety of the target.
-		
-	Difficulty Medium:
-		Shoots every other square until a target is hit. Determines the ships vector and discontinues
-		shooting when the ship has sunk.
-		"""
+
 	def __init__(self, column, row, ships):
-		self.column = column
-		self.row = row
-		self.ships = ships
-		player.__init__(self, self.column, self.row, self.ships)	
+		player.__init__(self, column, row, ships)	
 		self.random_Target_Queue = []		
 		self.target_Queue = []
-
-		self.column = []
-		self.get_Column_List()
-		self.row = []
-		self.get_Row_List()
-		self.ship_Lengths = {}
-		self.get_Ship_Lengths()
-		self.ship_List = []
-		self.get_Ship_List()
-		self.enemy_Ships_And_Their_coordinates = {}
-
-	def get_Column_List(self):
-		self.column = self.firing_Board.column
-
-	def get_Row_List(self):
-		self.row = self.firing_Board.row
-
-	def get_Ship_Lengths(self):
-		self.ship_Lengths = self.firing_Board.ships
-
-	def get_Ship_List(self):
-		for ship, length in self.firing_Board.ships.iteritems():
-			self.ship_List.append(str(ship))
-		
+				
 	def pick_Target(self):
 		# returns the target in format 'A4'
 		
@@ -69,12 +35,12 @@ class playerComputer(player):
 		
 	def confirmed_Coordinate_Of_This_Ship(self, coordinate, ship):
 		"""Create a link between an enemy ship and a coordinate"""
-		self.confirmed_Hit_Log.append(coordinate)
-		if ship not in self.enemy_Ships_And_Their_coordinates:
-			self.enemy_Ships_And_Their_coordinates[ship] = []
-			self.enemy_Ships_And_Their_coordinates[ship].append(coordinate)
+		self.shots_Fired_Hit_Log.append(coordinate)
+		if ship not in self.enemy_Ships_And_Their_Coordinates:
+			self.enemy_Ships_And_Their_Coordinates[ship] = []
+			self.enemy_Ships_And_Their_Coordinates[ship].append(coordinate)
 		else:
-			self.enemy_Ships_And_Their_coordinates[ship].append(coordinate)
+			self.enemy_Ships_And_Their_Coordinates[ship].append(coordinate)
 
 	def generate_Random_Queue_Targets(self):
 		column = self.column
@@ -129,17 +95,3 @@ class playerComputer(player):
 			adjacent_Coords.append((starting_Coord_Column_Letter + row[(starting_Coord_Row_Index - 1)]))
 
 		return (adjacent_Coords)
-
-	def is_Target_Valid(self, target):
-		valid_Firing_Board = self.firing_Board.valid_Target(target)
-		target_In_Shot_Log = self.is_Target_Shot_At(target)
-		if valid_Firing_Board == (True) and target_In_Shot_Log == (False):
-			return (True)
-		else:
-			return (False)
-
-	def is_Target_Shot_At(self, target):
-		if target in self.shots_Fired_Log:
-			return (True)
-		else:
-			return (False)

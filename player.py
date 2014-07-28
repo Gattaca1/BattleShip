@@ -1,3 +1,4 @@
+from random import randint
 from shipPlacement import shipPlacement
 
 class player(object):
@@ -5,7 +6,7 @@ class player(object):
 	def __init__(self, column, row, ships):
 		self.column = column
 		self.row = row
-		self.ships_And_Lengths = ships # 'Carrier':5,
+		self.ships_And_Lengths = ships
 		self.all_Board_Coordinates = []
 		self.generate_All_Board_Coordinates()
 		self.list_Of_Ship_Names = []
@@ -18,7 +19,7 @@ class player(object):
 		self.shots_Received_Log = []
 		self.shots_Received_Hit_Log = []
 
-		self.enemy_Ships_Known_Coordinates = {}
+		self.enemy_Ships_And_Their_Coordinates = {}
 
 		#         Things to track		
 		# Ships and associated coordinates
@@ -27,9 +28,9 @@ class player(object):
 		# Enemy ships & their coordinates
 		
 		self.ships_And_Associated_Coordinates = {}
-		self.get_Ships_And_Associated_Coordinates()
+		self.ships_And_Associated_Coordinates = self.get_Ships_And_Associated_Coordinates()
 		self.occupied_Coordinates = []
-		self.get_List_Of_All_Occupied_Coordinates()		
+		self.occupied_Coordinates = self.get_List_Of_All_Occupied_Coordinates()
 
 	################ PUBLIC ################
 				
@@ -38,13 +39,13 @@ class player(object):
 
 	def shot_Fired_Hit_Ship_At_Coordinate(self, coordinate, ship_Name):
 		self.shots_Fired_Hit_Log.append(coordinate)
-		if ship_Name not in self.enemy_Ships_Known_Coordinates:
-			self.enemy_Ships_Known_Coordinates[ship_Name] = []
-			self.enemy_Ships_Known_Coordinates[ship_Name].append(coordinate)
+		if ship_Name not in self.enemy_Ships_And_Their_Coordinates:
+			self.enemy_Ships_And_Their_Coordinates[ship_Name] = []
+			self.enemy_Ships_And_Their_Coordinates[ship_Name].append(coordinate)
 		else:
-			self.enemy_Ships_Known_Coordinates[ship_Name].append(coordinate)
+			self.enemy_Ships_And_Their_Coordinates[ship_Name].append(coordinate)
 		
-	def shot_Received(self, coordinate, is_Ship_Hit):
+	def shot_Received(self, coordinate):
 		self.shots_Received_Log.append(coordinate)
 
 	def shot_Received_Is_Confirmed_Hit(self, coordinate):
@@ -65,15 +66,15 @@ class player(object):
 	def is_Ship_Sunk(self, ship_Name):
 		ship_Coordinates = self.ships_And_Associated_Coordinates[ship_Name]
 		remaining_Coords = set(ship_Coordinates) - set(self.shots_Received_Log)
-		if remaining_Coords == []:
+		if bool(remaining_Coords) == (False):
 			return (True)
 		else:
 			return (False)
 		
 	def are_Ships_Remaining(self):
 		tally = 0
-		for ship_Name, ship_Length in self.ships_And_Lengths.iteritems():
-			tally =+ ship_Length
+		for ship_Name in self.ships_And_Lengths:
+			tally += self.ships_And_Lengths[ship_Name]
 		if tally > len(self.shots_Received_Hit_Log):
 			return (True)
 		elif tally == len(self.shots_Received_Hit_Log):
@@ -84,13 +85,12 @@ class player(object):
 	def is_Target_Valid(self, coordinate):
 		# coordinate must exist
 		# coordinate must not yet be shot at
-		if coordinate not in self.shots_Fired_Log:
-			if coordinate in self.all_Board_Coordinates:
-				return (True)
-			else:
-				return (False)
-		else:
+		if coordinate not in self.all_Board_Coordinates:
 			return (False)
+
+		if coordinate in self.shots_Fired_Log:
+			return (False)
+		return (True)
 
 	def return_Board_Info(self):
 		""" Returns a list of 4 items, each item being a list. They are as follows:

@@ -1,3 +1,4 @@
+from random import randint
 from displayBoard import displayBoard
 from player import player
 from playerHuman import playerHuman
@@ -65,6 +66,7 @@ class gameEngine(object):
 		if is_Coordinate_Occupied == (True):
 			ship_Name = tango.which_Boat_At_Coordinate(coordinate)
 			friendly.shot_Fired_Hit_Ship_At_Coordinate(coordinate, ship_Name)
+			tango.shot_Received_Is_Confirmed_Hit(coordinate)
 			print "[Console]> " + ship_Name + " Hit"
 			ship_Sunk = tango.is_Ship_Sunk(ship_Name)
 			if ship_Sunk == (True):

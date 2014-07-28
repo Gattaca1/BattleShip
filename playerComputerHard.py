@@ -1,12 +1,10 @@
+from random import randint
 from playerComputer import playerComputer
 
 class playerComputerHard(playerComputer):	
 
 	def __init__(self, column, row, ships):
-		self.column = column
-		self.row = row
-		self.ships = ships
-		playerComputer.__init__(self, self.column, self.row, self.ships)
+		playerComputer.__init__(self, column, row, ships)
 		self.board_Probability = {}
 		self.probability = 0
 		self.weight = 1
@@ -16,12 +14,12 @@ class playerComputerHard(playerComputer):
 		self.initialize_Ships_Remaining()
 
 	def initialize_Ships_Remaining(self):
-		for ship in self.ship_List:
+		for ship in self.list_Of_Ship_Names:
 			self.ships_Remaining.append(ship)
 
 	def which_Ships_Remaining(self):
-		for ship in self.enemy_Ships_And_Their_coordinates:
-			if len(self.enemy_Ships_And_Their_coordinates[ship]) == self.ship_Lengths[ship]:
+		for ship in self.enemy_Ships_And_Their_Coordinates:
+			if len(self.enemy_Ships_And_Their_Coordinates[ship]) == self.ships_And_Lengths[ship]:
 				try:
 					self.ships_Remaining.remove(ship)
 				except:
@@ -52,9 +50,9 @@ class playerComputerHard(playerComputer):
 	def determine_Each_Coordinate_Probability(self):
 		self.purge_Then_Generate_Probability_Board()
 		for ship in self.ships_Remaining:
-			if ship in self.enemy_Ships_And_Their_coordinates:
-				ship_Length = self.ship_Lengths[ship]
-				if len(self.enemy_Ships_And_Their_coordinates[ship]) == ship_Length:
+			if ship in self.enemy_Ships_And_Their_Coordinates:
+				ship_Length = self.ships_And_Lengths[ship]
+				if len(self.enemy_Ships_And_Their_Coordinates[ship]) == ship_Length:
 					continue
 			self.horizontal_Positions(ship)
 			self.vertical_Positions(ship)
@@ -69,7 +67,7 @@ class playerComputerHard(playerComputer):
 
 	def horizontal_Positions(self, ship):
 		# Generate every horizontal position a ship can have
-		ship_Length = self.ship_Lengths[ship]
+		ship_Length = self.ships_And_Lengths[ship]
 		for letter in self.column:
 			for number in self.row:
 
@@ -84,7 +82,7 @@ class playerComputerHard(playerComputer):
 
 	def vertical_Positions(self, ship):
 		# Generate every vertical position a ship can have
-		ship_Length = self.ship_Lengths[ship]
+		ship_Length = self.ships_And_Lengths[ship]
 		for number in self.row:
 			for letter in self.column:
 
@@ -121,15 +119,15 @@ class playerComputerHard(playerComputer):
 
 	def ship_Coordinates(self, ship):
 		confirmed_Hits = []
-		if ship in self.enemy_Ships_And_Their_coordinates:
-			confirmed_Hits = self.enemy_Ships_And_Their_coordinates[ship]
+		if ship in self.enemy_Ships_And_Their_Coordinates:
+			confirmed_Hits = self.enemy_Ships_And_Their_Coordinates[ship]
 		return confirmed_Hits
 
 	def invalid_Points(self, ship):
 		invalids = []
 		for coordinate in self.shots_Fired_Log:
-			if ship in self.enemy_Ships_And_Their_coordinates:
-				if coordinate not in self.enemy_Ships_And_Their_coordinates[ship]:
+			if ship in self.enemy_Ships_And_Their_Coordinates:
+				if coordinate not in self.enemy_Ships_And_Their_Coordinates[ship]:
 					invalids.append(coordinate)
 			else:
 				invalids.append(coordinate)

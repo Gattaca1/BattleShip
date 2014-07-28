@@ -18,3 +18,8 @@ class displayBoard(object):
 
 		self.firing_Board.display_Board('Firing Board')
 		self.ship_Board.display_Board('Ship Board')
+
+		#print "occupied_Coordinates: " + str(occupied_Coordinates)
+		#print "shots_Received_Log: " + str(shots_Received_Log)
+		#print "shots_Fired_Log: " + str(shots_Fired_Log)
+		#print "shots_Fired_Hit_Log: " + str(shots_Fired_Hit_Log)

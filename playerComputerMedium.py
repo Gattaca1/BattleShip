@@ -1,3 +1,4 @@
+from random import randint
 from playerComputer import playerComputer
 
 class playerComputerMedium(playerComputer):
@@ -7,16 +8,13 @@ class playerComputerMedium(playerComputer):
 	#if something needs to be removed.
 
 	def __init__(self, column, row, ships):
-		self.column = column
-		self.row = row
-		self.ships = ships
-		playerComputer.__init__(self, self.column, self.row, self.ships)
+		playerComputer.__init__(self, column, row, ships)
 		self.generate_Random_Queue_Targets()
 
 	def find_Future_Targets(self):
 		#grab a target from the firing log. If its empty then default to a random shot.
 
-		num_Of_Enemy_Ships_Hit = (len(self.enemy_Ships_And_Their_coordinates))
+		num_Of_Enemy_Ships_Hit = (len(self.enemy_Ships_And_Their_Coordinates))
 
 		if num_Of_Enemy_Ships_Hit > (0):
 			self.add_Potential_Target_To_Firing_Queue()
@@ -25,9 +23,9 @@ class playerComputerMedium(playerComputer):
 		#have any ships been hit that are not yet sunk? better try and sink that ship
 		#are two coordinates known, or just one?
 
-		for ship in self.enemy_Ships_And_Their_coordinates:
-			num_Of_Coordinates_Hit_On_Ship = len(self.enemy_Ships_And_Their_coordinates[ship])
-			ship_Length = self.ship_Lengths[ship]
+		for ship in self.enemy_Ships_And_Their_Coordinates:
+			num_Of_Coordinates_Hit_On_Ship = len(self.enemy_Ships_And_Their_Coordinates[ship])
+			ship_Length = self.ships_And_Lengths[ship]
 
 			if num_Of_Coordinates_Hit_On_Ship != ship_Length:			
 				#see if it has 1 coordinate, or 2+
@@ -47,7 +45,7 @@ class playerComputerMedium(playerComputer):
 	def rand_Coord_Adjacent_To_Confirmed_Hit(self, ship):
 		# confirmed_Hit = B3
 		# Add to potential_Targets: B2, B4, A3, C3
-		confirmed_Hit_Coordinate = self.enemy_Ships_And_Their_coordinates[ship][0]
+		confirmed_Hit_Coordinate = self.enemy_Ships_And_Their_Coordinates[ship][0]
 		potential_Targets = self.all_Adjacent_Coords(confirmed_Hit_Coordinate)
 		for target in potential_Targets:
 			valid = self.is_Target_Valid(target)
@@ -71,8 +69,8 @@ class playerComputerMedium(playerComputer):
 			return target
 
 	def determine_Vector(self, ship):
-		first_Confirmed_Coordinate = self.enemy_Ships_And_Their_coordinates[ship][0]
-		second_Confirmed_Coordinate = self.enemy_Ships_And_Their_coordinates[ship][1]
+		first_Confirmed_Coordinate = self.enemy_Ships_And_Their_Coordinates[ship][0]
+		second_Confirmed_Coordinate = self.enemy_Ships_And_Their_Coordinates[ship][1]
 
 		first_Coordinate_Column_Letter = first_Confirmed_Coordinate[:1]
 		first_Coordinate_Row_Number = first_Confirmed_Coordinate[1:]
@@ -93,13 +91,13 @@ class playerComputerMedium(playerComputer):
 		column = self.column
 		row = self.row
 
-		coordinate = self.enemy_Ships_And_Their_coordinates[ship][0]
+		coordinate = self.enemy_Ships_And_Their_Coordinates[ship][0]
 		coordinate_Column_Letter = coordinate[:1]
 		coordinate_Row_Number = coordinate[1:]
 		coordinate_Row_Index = row.index(coordinate_Row_Number)
 
-		num_Of_Coordinates_Hit_On_Ship = len(self.enemy_Ships_And_Their_coordinates[ship])
-		ship_Length = self.ship_Lengths[ship]
+		num_Of_Coordinates_Hit_On_Ship = len(self.enemy_Ships_And_Their_Coordinates[ship])
+		ship_Length = self.ships_And_Lengths[ship]
 		
 		#fire right until it misses
 		#then fire left until it misses.
@@ -120,7 +118,7 @@ class playerComputerMedium(playerComputer):
 
 			# If previous vector was a confirmed hit, move right 1
 			increased_Vector = ''	
-			if previous_Increased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
+			if previous_Increased_Vector in self.enemy_Ships_And_Their_Coordinates[ship]:
 				increased_Vector = (coordinate_Column_Letter + row[(coordinate_Row_Index + increment)])
 			else:
 				continue
@@ -150,7 +148,7 @@ class playerComputerMedium(playerComputer):
 
 			# If the previous vector was a confirmed hit, move left 1
 			decreased_Vector = ''	
-			if previous_Decreased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
+			if previous_Decreased_Vector in self.enemy_Ships_And_Their_Coordinates[ship]:
 				decreased_Vector = (coordinate_Column_Letter + row[(coordinate_Row_Index - increment)])
 			else:
 				continue
@@ -172,13 +170,13 @@ class playerComputerMedium(playerComputer):
 		column = self.column
 		row = self.row
 
-		coordinate = self.enemy_Ships_And_Their_coordinates[ship][0]
+		coordinate = self.enemy_Ships_And_Their_Coordinates[ship][0]
 		coordinate_Column_Letter = coordinate[:1]
 		coordinate_Row_Number = coordinate[1:]
 		coordinate_Column_Index = column.index(coordinate_Column_Letter)		
 
-		num_Of_Coordinates_Hit_On_Ship = len(self.enemy_Ships_And_Their_coordinates[ship])
-		ship_Length = self.ship_Lengths[ship]
+		num_Of_Coordinates_Hit_On_Ship = len(self.enemy_Ships_And_Their_Coordinates[ship])
+		ship_Length = self.ships_And_Lengths[ship]
 
 		#fire down until it misses
 		#then fire up until it misses.
@@ -198,7 +196,7 @@ class playerComputerMedium(playerComputer):
 
 			# If the previous vector was a confirmed hit, move down 1
 			increased_Vector = ''
-			if previous_Increased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
+			if previous_Increased_Vector in self.enemy_Ships_And_Their_Coordinates[ship]:
 				increased_Vector = (column[(coordinate_Column_Index + increment)] + coordinate_Row_Number)
 			else:
 				continue
@@ -227,7 +225,7 @@ class playerComputerMedium(playerComputer):
 
 			#If the previous vector was a confirmed hit, move up 1
 			decreased_Vector = ''
-			if previous_Decreased_Vector in self.enemy_Ships_And_Their_coordinates[ship]:
+			if previous_Decreased_Vector in self.enemy_Ships_And_Their_Coordinates[ship]:
 				decreased_Vector = (column[(coordinate_Column_Index - increment)] + coordinate_Row_Number)
 			else:
 				continue

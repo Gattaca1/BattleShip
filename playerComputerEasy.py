@@ -3,15 +3,12 @@ from playerComputer import playerComputer
 class playerComputerEasy(playerComputer):
 
 	def __init__(self, column, row, ships):
-		self.column = column
-		self.row = row
-		self.ships = ships
-		playerComputer.__init__(self, self.column, self.row, self.ships)
+		playerComputer.__init__(self, column, row, ships)
 		self.generate_Random_Queue_Targets()	
 
 	def find_Future_Targets(self):
 		#Add area around confirmed hits to a firing queue
-		for confirmed_Hit_Coordinate in self.confirmed_Hit_Log:
+		for confirmed_Hit_Coordinate in self.shots_Fired_Hit_Log:
 			potential_Targets = self.all_Adjacent_Coords(confirmed_Hit_Coordinate)
 
 			# Only add it if its not in the queue already
