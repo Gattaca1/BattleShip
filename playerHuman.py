@@ -14,7 +14,7 @@ class playerHuman(player):
 		while target_Picked == (False):
 	
 			print "Shoot with the format A4"
-			target = str(raw_input("[You]> ")).upper()
+			target = str(raw_input("[" + self.name + "]> ")).upper()
 			valid = self.is_Target_Valid(target)
 			target_Picked = valid
 			

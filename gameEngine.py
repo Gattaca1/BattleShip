@@ -46,7 +46,7 @@ class gameEngine(object):
 			self.select_Game_Mode()
 
 	def initialize_Opponent(self):
-		print "Select plaer 2 difficulty: Easy, Medium, Hard"
+		print "Select player 2 difficulty: Easy, Medium, Hard"
 		return self.select_Difficulty()
 		
 	def select_Difficulty(self):		

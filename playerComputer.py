@@ -17,7 +17,7 @@ class playerComputer(player):
 			valid = self.is_Target_Valid(target)
 			target_Picked = valid
 		
-		print "[Opponent]> " + target
+		print "[" + self.roll + "]> " + target
 		return target
 
 	def computer_Logic(self):
