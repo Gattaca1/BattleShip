@@ -2,7 +2,9 @@ from playerComputer import playerComputer
 
 class playerComputerEasy(playerComputer):
 
-	def __init__(self, column, row, ships):
+	def __init__(self, column, row, ships, roll):
+		self.name = "ComputerEasy"
+		self.roll = roll
 		playerComputer.__init__(self, column, row, ships)
 		self.generate_Random_Queue_Targets()	
 

@@ -7,7 +7,9 @@ class playerComputerMedium(playerComputer):
 	#only add 1 thing to the firing queue at a time. that way you never have to derive the logic to decide
 	#if something needs to be removed.
 
-	def __init__(self, column, row, ships):
+	def __init__(self, column, row, ships, roll):
+		self.name = "ComputerMedium"
+		self.roll = roll
 		playerComputer.__init__(self, column, row, ships)
 		self.generate_Random_Queue_Targets()
 

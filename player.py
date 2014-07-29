@@ -4,29 +4,24 @@ from shipPlacement import shipPlacement
 class player(object):
 
 	def __init__(self, column, row, ships):
-		self.column = column
-		self.row = row
-		self.ships_And_Lengths = ships
-		self.all_Board_Coordinates = []
-		self.generate_All_Board_Coordinates()
-		self.list_Of_Ship_Names = []
-		self.generate_List_Of_Ship_Names()		
-		
-		self.generated_Ship_Coordinates = shipPlacement(self.column, self.row, self.ships_And_Lengths, self.all_Board_Coordinates)
-		
-		self.shots_Fired_Log = []
-		self.shots_Fired_Hit_Log = []
-		self.shots_Received_Log = []
-		self.shots_Received_Hit_Log = []
-
-		self.enemy_Ships_And_Their_Coordinates = {}
-
 		#         Things to track		
 		# Ships and associated coordinates
 		# Shots fired, shots connected, 
 		# Shots received, shots received connected
 		# Enemy ships & their coordinates
-		
+		self.column = column
+		self.row = row
+		self.ships_And_Lengths = ships
+		self.all_Board_Coordinates = []
+		self.all_Board_Coordinates = self.get_All_Board_Coordinates()
+		self.list_Of_Ship_Names = []
+		self.list_Of_Ship_Names = self.get_List_Of_Ship_Names()		
+		self.generated_Ship_Coordinates = shipPlacement(self.column, self.row, self.ships_And_Lengths, self.all_Board_Coordinates)
+		self.shots_Fired_Log = []
+		self.shots_Fired_Hit_Log = []
+		self.shots_Received_Log = []
+		self.shots_Received_Hit_Log = []
+		self.enemy_Ships_And_Their_Coordinates = {}		
 		self.ships_And_Associated_Coordinates = {}
 		self.ships_And_Associated_Coordinates = self.get_Ships_And_Associated_Coordinates()
 		self.occupied_Coordinates = []
@@ -82,6 +77,40 @@ class player(object):
 		else:
 			print 'error in are_Ships_Remaining'
 
+	def return_Board_Info(self):
+		empty_List = []
+		return empty_List
+
+	def pick_Target(self):
+		pass
+
+	def get_Name(self):
+		return self.name
+
+	def get_Roll(self):
+		return self.roll
+
+	################ PRIVATE ################
+
+	def get_List_Of_Ship_Names(self):
+		names = []
+		for ship_Name, ship_Length in self.ships_And_Lengths.iteritems():
+			names.append(ship_Name)
+		return names
+
+	def get_All_Board_Coordinates(self):
+		all_Coords = []
+		for letter in self.column:
+			for number in self.row:
+				all_Coords.append(letter + number)
+		return all_Coords
+
+	def get_List_Of_All_Occupied_Coordinates(self):
+		return self.generated_Ship_Coordinates.return_All_Occupied_Positions()
+
+	def get_Ships_And_Associated_Coordinates(self):
+		return self.generated_Ship_Coordinates.return_Ship_Names_And_Coordinates()
+
 	def is_Target_Valid(self, coordinate):
 		# coordinate must exist
 		# coordinate must not yet be shot at
@@ -91,38 +120,3 @@ class player(object):
 		if coordinate in self.shots_Fired_Log:
 			return (False)
 		return (True)
-
-	def return_Board_Info(self):
-		""" Returns a list of 4 items, each item being a list. They are as follows:
-		1) all occupied Coordinates
-		2) all shots received
-		3) all shots fired
-		4) all shots hit
-		"""
-		#my occupied coordinates
-		#shots received
-		#shots fired
-		#shots hit
-		board_Info = []
-		board_Info.append(self.occupied_Coordinates)
-		board_Info.append(self.shots_Received_Log)
-		board_Info.append(self.shots_Fired_Log)
-		board_Info.append(self.shots_Fired_Hit_Log)
-		return board_Info
-
-	################ PRIVATE ################
-
-	def generate_List_Of_Ship_Names(self):
-		for ship_Name, ship_Length in self.ships_And_Lengths.iteritems():
-			self.list_Of_Ship_Names.append(ship_Name)
-
-	def generate_All_Board_Coordinates(self):
-		for letter in self.column:
-			for number in self.row:
-				self.all_Board_Coordinates.append(letter + number)
-
-	def get_List_Of_All_Occupied_Coordinates(self):
-		return self.generated_Ship_Coordinates.return_All_Occupied_Positions()
-
-	def get_Ships_And_Associated_Coordinates(self):
-		return self.generated_Ship_Coordinates.return_Ship_Names_And_Coordinates()

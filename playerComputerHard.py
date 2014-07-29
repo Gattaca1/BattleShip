@@ -3,7 +3,9 @@ from playerComputer import playerComputer
 
 class playerComputerHard(playerComputer):	
 
-	def __init__(self, column, row, ships):
+	def __init__(self, column, row, ships, roll):
+		self.name = "ComputerHard"
+		self.roll = roll
 		playerComputer.__init__(self, column, row, ships)
 		self.board_Probability = {}
 		self.probability = 0

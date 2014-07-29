@@ -32,15 +32,6 @@ class playerComputer(player):
 		else:
 			target = self.random_Target_Queue.pop(randint(0, (len(self.random_Target_Queue) - 1)))
 			return target
-		
-	def confirmed_Coordinate_Of_This_Ship(self, coordinate, ship):
-		"""Create a link between an enemy ship and a coordinate"""
-		self.shots_Fired_Hit_Log.append(coordinate)
-		if ship not in self.enemy_Ships_And_Their_Coordinates:
-			self.enemy_Ships_And_Their_Coordinates[ship] = []
-			self.enemy_Ships_And_Their_Coordinates[ship].append(coordinate)
-		else:
-			self.enemy_Ships_And_Their_Coordinates[ship].append(coordinate)
 
 	def generate_Random_Queue_Targets(self):
 		column = self.column

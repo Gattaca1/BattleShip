@@ -1,3 +1,4 @@
+from sys import exit
 from gameBoard import gameBoard
 
 class displayBoard(object):
@@ -7,6 +8,9 @@ class displayBoard(object):
 		self.ship_Board = gameBoard(column, row)
 
 	def display_Boards(self, board_Info):
+		if len(board_Info) == (0):
+			return
+
 		occupied_Coordinates, shots_Received_Log, shots_Fired_Log, shots_Fired_Hit_Log = board_Info
 		# occupied_Coordinates = Boat Coordinates, yours
 		# shots_Fired_Hit_Log = Boat Coordinates, enemy
