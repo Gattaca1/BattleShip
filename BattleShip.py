@@ -5,11 +5,11 @@ from gameEngine import gameEngine
 def play_Again():
 	
 	restart = ''
-	while restart != 'y' and restart != 'n':
+	while restart != 'Y' and restart != 'N':
 		print "Play again? answer with y or n"
-		restart = raw_input("> ")
+		restart = raw_input("> ").upper()
 		
-	if restart == 'y':
+	if restart == 'Y':
 		return (True)		
 	else:
 		return (False)
