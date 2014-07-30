@@ -51,7 +51,8 @@ class gameEngine(object):
 		
 	def select_Difficulty(self):		
 		difficulty = raw_input("> ").upper()
-		if difficulty == ('EASY') or difficulty == ('MEDIUM') or difficulty == ('HARD'):
+		modes = ['EASY', 'MEDIUM', 'HARD']
+		if difficulty in modes:
 			return difficulty
 		else:
 			self.select_Difficulty()
